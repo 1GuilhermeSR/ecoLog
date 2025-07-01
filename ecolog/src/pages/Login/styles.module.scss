@@ -1,0 +1,12 @@
+.main {
+    height: 100vh;
+    display: flex;
+    background: url('../../../public/bgLogin.jpg') no-repeat center/cover;
+
+    .container {
+        background-color: white;
+        width: 35vw;
+        height: 100vh;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+}
