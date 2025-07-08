@@ -10,3 +10,26 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 }
+
+.header {
+  position: relative;
+  display: flex;
+  justify-content: center;  /* centraliza o logo */
+  align-items: center;
+}
+
+.backIcon {
+  position: absolute;
+  left: 6rem;               /* ajuste a distância da borda esquerda */
+  top: 20%;
+  //transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 2.2em;
+  color: #D4D4D4;
+}
+
+.logo {
+  width: 10vw;
+  user-select: none;
+  /* não precisa de marginLeft/Right auto aqui, pois o flex + justify-center já centraliza */
+}
