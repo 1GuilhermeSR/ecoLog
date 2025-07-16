@@ -1,44 +1,39 @@
 import { Col, DatePicker, Flex, Form, FormProps, Input, Modal, Row, Select, Typography } from 'antd';
 import styles from './styles.module.scss';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import BtnPrincipal from '../../components/BtnPrincipal';
 import BtnSecundario from '../../components/BtnSecundario';
-import { LoginDTO } from '../../dto/LoginDTO';
 import { UsuarioDTO } from '../../dto/UsuarioDTO';
 import { IoChevronBackSharp } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
+import { formatCpf } from '../../utils/stringUtils';
 
-const { Text, Link } = Typography;
+
+const { Text } = Typography;
 
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
 const BackIcon = IoChevronBackSharp as unknown as SVGIcon;
 
 export default function Login() {
+    const navigate = useNavigate();
     const [opcao, setOpcao] = useState<number>(1);
     const [formUsuario] = Form.useForm();
     const [formRedefinirSenha] = Form.useForm();
     const [dadosUsuario, setDadosUsuario] = useState<Partial<UsuarioDTO>>({});
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    function formatCpf(value: string): string {
-        const digits = value.replace(/\D/g, '').slice(0, 11);
-        let formatted = digits.replace(/^(\d{3})(\d)/, '$1.$2');
-        formatted = formatted.replace(/^(\d{3}\.\d{3})(\d)/, '$1.$2');
-        formatted = formatted.replace(/^(\d{3}\.\d{3}\.\d{3})(\d)/, '$1-$2');
-
-        return formatted;
-    }
 
     const handleCpfChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-        const formatted = formatCpf(e.target.value);
-        formUsuario.setFieldsValue({ cpf: formatted });
-    };
+        const formatted = formatCpf(e.target.value)
+        formUsuario.setFieldsValue({ cpf: formatted })
+    }
 
     function usuarioJaTemCadastro() {
         return opcao == 1 ? true : false;
     }
 
     function login() {
-
+        navigate('/home');
     }
 
     function proximo() {
@@ -117,7 +112,7 @@ export default function Login() {
                                         <Flex gap="middle" vertical style={{ gap: '26px' }}>
                                             <Form.Item<UsuarioDTO["email"]>
                                                 name="email"
-                                                rules={[{ required: usuarioJaTemCadastro(), message: 'Por favor, preencha seu email corretamente!', type: 'email' }]}
+                                                rules={[{ required: false, message: 'Por favor, preencha seu email corretamente!', type: 'email' }]}
                                                 style={{ marginBottom: '0px' }}
                                             >
                                                 <Input size="large" placeholder="Email@" variant="underlined" />
@@ -125,7 +120,7 @@ export default function Login() {
 
                                             <Form.Item<UsuarioDTO["senha"]>
                                                 name="senha"
-                                                rules={[{ required: usuarioJaTemCadastro(), message: 'Por favor, preencha sua senha!' }]}
+                                                rules={[{ required: false, message: 'Por favor, preencha sua senha!' }]}
                                             >
                                                 <Input.Password size="large" placeholder="Senha" variant="underlined" />
                                             </Form.Item>
@@ -171,7 +166,7 @@ export default function Login() {
 
                                         <Form.Item<UsuarioDTO["cpf"]>
                                             name="cpf"
-                                            rules={[{ required: !usuarioJaTemCadastro(), message: 'Por Favor, preencha seu CPF!', len:14 }]}
+                                            rules={[{ required: !usuarioJaTemCadastro(), message: 'Por Favor, preencha seu CPF!', len: 14 }]}
                                             style={{ marginBottom: '0px' }}
                                         >
                                             <Input size="large" onChange={handleCpfChange} placeholder="CPF" variant="underlined" />

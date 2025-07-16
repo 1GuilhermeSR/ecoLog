@@ -1,4 +1,4 @@
-import { LoginDTO } from "./LoginDTO";
+
 
 export interface UsuarioDTO {
     nome: string;
