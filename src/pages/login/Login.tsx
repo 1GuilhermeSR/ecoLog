@@ -1,8 +1,8 @@
 import { Col, DatePicker, Flex, Form, FormProps, Input, Modal, Row, Select, Typography } from 'antd';
 import styles from './styles.module.scss';
 import { useState } from 'react';
-import BtnPrincipal from '../../components/BtnPrincipal';
-import BtnSecundario from '../../components/BtnSecundario';
+import BtnPrincipal from '../../components/geral/BtnPrincipal';
+import BtnSecundario from '../../components/geral/BtnSecundario';
 import { UsuarioDTO } from '../../dto/UsuarioDTO';
 import { IoChevronBackSharp } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
@@ -52,8 +52,6 @@ export default function Login() {
         }
         setOpcao(opcao - 1);
     }
-
-
 
     const onFinishLogin: FormProps<UsuarioDTO>['onFinish'] = (values) => {
         if (opcao == 2) {

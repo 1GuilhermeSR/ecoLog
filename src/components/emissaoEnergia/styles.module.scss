@@ -1,0 +1,59 @@
+.mainForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .containerForm {
+        display: flex;
+        flex-direction: column;
+        padding-right: 3vw;
+        padding-left: 3vw;
+        gap: 48px;
+
+        .label {
+            font-size: 1.2em;
+            color: #8d8d8d;
+        }
+
+        .inputKwh{
+            input{
+                font-size: 1.1em;
+                color:#666666ff;
+            }
+        }
+
+        .cardCO2 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 50%;
+            height: 16vh;
+            border: 1px solid #8d8d8d6b;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+
+            .label {
+                position: absolute;
+                top: 0.5rem;
+                /* ajuste o espaçamento que quiser */
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.9em;
+                color: #8d8d8d;
+            }
+
+            .valor {
+                font-size: 1.4em;
+                color: #808080;
+                font-weight: 600;
+                margin-top: auto;
+                margin-bottom: auto;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+    }
+}
