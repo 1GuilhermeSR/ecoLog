@@ -7,6 +7,7 @@ import Login from '../pages/login/Login';
 import Home from '../pages/home/Home';
 import EmissaoEnergia from '../pages/emissao_energia/EmissaoEnergia';
 import EmissaoCombustivel from '../pages/emissao_combustivel/EmissaoCombustivel';
+import Usuario from '../pages/usuario/Usuario';
 
 
 export default function AppRoutes() {
@@ -20,6 +21,7 @@ export default function AppRoutes() {
           <Route path="/home" element={<Home />} />
           <Route path="/emissaoEnergia" element={<EmissaoEnergia />} />
           <Route path="/emissaoCombustivel" element={<EmissaoCombustivel />} />
+          <Route path="/usuario" element={<Usuario />} />
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Route>
 

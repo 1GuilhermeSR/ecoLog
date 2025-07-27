@@ -16,7 +16,7 @@ export default function AppLayout() {
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
     switch (key) {
       case '1':
-        navigate('/profile');
+        navigate('/usuario');
         break;
       case '2':
         navigate('/login');
@@ -36,7 +36,7 @@ export default function AppLayout() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
 
-      <Header style={{ display: 'flex', backgroundColor: 'white', padding: '0px' }}>
+      <Header style={{ display: 'flex', backgroundColor: 'white', padding: '0px',height:'8vh' }}>
         <div className={styles.header}>
 
           <div className={styles.containerLogo}>

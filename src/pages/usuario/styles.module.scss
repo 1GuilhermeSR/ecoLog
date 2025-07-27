@@ -1,0 +1,35 @@
+.main {
+    height: 92vh;
+    display: flex;
+    margin-right: auto;
+
+    .container {
+        background-color: white;
+        width: 35vw;
+        height: 92vh;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        padding-top: 28px;
+
+        .header {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .backIcon {
+                position: absolute;
+                left: 3rem;
+                cursor: pointer;
+                font-size: 2.3em;
+                color: #D4D4D4;
+            }
+            
+            span{
+                font-size: 1.9em;
+                color: #5C5C5C;
+                top: 20%;
+            }
+        }
+
+    }
+}
