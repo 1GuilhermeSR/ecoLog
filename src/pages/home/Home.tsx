@@ -10,7 +10,7 @@ export default function Home() {
     return (
         <div className={styles.main}>
 
-            <div className={styles.card}>
+            <div className={styles.card} onClick={() => {(navigate('/minhasEmissoes'))}}>
                 <div className={styles.containerIcon}>
                     <DashboardIcon className={styles.icone} />
                 </div>

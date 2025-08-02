@@ -1,0 +1,55 @@
+.cardCarousel {
+    display: flex;
+    margin: 0;
+    height: 160px;
+    color: #fff;
+    //line-Height: 160px;
+    text-Align: center;
+    background-color: #e2e2e20c;
+    justify-content: center;
+
+    .container {
+        display: flex;
+        max-height: 100%;
+        align-items: center;
+        position: relative; 
+
+        svg {
+            position: absolute;
+            left: -6rem;
+            color: #8d8d8d4b;
+            font-size: 5em;
+        }
+
+        .box {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .titulo {
+                font-size: 1.1em;
+                color: #5D5D5D;
+            }
+
+            .valor {
+                font-size: 1.3em;
+                color: #5D5D5D;
+            }
+        }
+    }
+}
+
+
+
+
+
+.cardMensagem {
+    padding: 8px;
+    border: 1px solid #8d8d8d4b;
+    border-radius: 8px;
+
+    span {
+        font-weight: 400;
+        color: #5d5d5d;
+    }
+}
