@@ -9,7 +9,7 @@ import Dashboard from '../pages/minhas_emissoes/Dashboard';
 import EmissaoEnergia from '../pages/emissao_energia/EmissaoEnergia';
 import EmissaoCombustivel from '../pages/emissao_combustivel/EmissaoCombustivel';
 import Usuario from '../pages/usuario/Usuario';
-
+import RecuperarSenha from '../pages/recuperar_senha/RecuperarSenha';
 
 export default function AppRoutes() {
   return (
@@ -28,6 +28,8 @@ export default function AppRoutes() {
         </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />
+         <Route path="/recuperarSenha" element={<RecuperarSenha/>} />
+        
 
       </Routes>
     </BrowserRouter>
