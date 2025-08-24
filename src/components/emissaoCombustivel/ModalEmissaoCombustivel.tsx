@@ -1,6 +1,6 @@
 import { Col, DatePicker, Flex, Form, FormProps, Input, InputNumber, Modal, Row, Select } from 'antd';
-import { EmissaoCombustivelDTO } from '../../dto/EmissaoCombustivelDTO';
-import { CombustivelDTO } from '../../dto/CombustivelDTO';
+import { EmissaoCombustivelDTO } from '../../dto/emissao_combustivel/EmissaoCombustivelDTO';
+import { CombustivelDTO } from '../../dto/combustivel/CombustivelDTO';
 import BtnPrincipal from '../geral/BtnPrincipal';
 import BtnSecundario from '../geral/BtnSecundario';
 import styles from './styles.module.scss';

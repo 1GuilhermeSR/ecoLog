@@ -4,7 +4,7 @@ import { IoChevronBackSharp } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import BtnPrincipal from '../../components/geral/BtnPrincipal';
 import Input, { SearchProps } from 'antd/es/input';
-import { EmissaoCombustivelDTO } from '../../dto/EmissaoCombustivelDTO';
+import { EmissaoCombustivelDTO } from '../../dto/emissao_combustivel/EmissaoCombustivelDTO';
 import { useState, useEffect } from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';

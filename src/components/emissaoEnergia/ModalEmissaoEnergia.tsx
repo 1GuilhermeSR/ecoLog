@@ -1,5 +1,5 @@
 import { Col, DatePicker, Flex, Form, FormProps, InputNumber, Modal, Row } from 'antd';
-import { EmissaoEnergiaDTO } from '../../dto/EmissaoEnergiaDTO';
+import { EmissaoEnergiaDTO } from '../../dto/emissao_energia/EmissaoEnergiaDTO';
 import BtnPrincipal from '../geral/BtnPrincipal';
 import BtnSecundario from '../geral/BtnSecundario';
 import styles from './styles.module.scss';

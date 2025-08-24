@@ -10,33 +10,36 @@ import EmissaoCombustivel from '../pages/emissao_combustivel/EmissaoCombustivel'
 import Usuario from '../pages/usuario/Usuario';
 import RecuperarSenha from '../pages/recuperar_senha/RecuperarSenha';
 import ProtectedRoute from './ProtectedRoutes';
+import { AuthProvider } from '../context/AuthContext';
 
 
 export default function AppRoutes() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Rotas públicas */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/recuperarSenha" element={<RecuperarSenha />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Rotas públicas */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/recuperarSenha" element={<RecuperarSenha />} />
 
-        {/* Rotas protegidas */}
-        <Route element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }>
-          <Route path="/home" element={<Home />} />
-          <Route path="/minhasEmissoes" element={<Dashboard />} />
-          <Route path="/emissaoEnergia" element={<EmissaoEnergia />} />
-          <Route path="/emissaoCombustivel" element={<EmissaoCombustivel />} />
-          <Route path="/usuario" element={<Usuario />} />
-          <Route path="/" element={<Navigate to="/home" replace />} />
-        </Route>
+          {/* Rotas protegidas */}
+          <Route element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="/home" element={<Home />} />
+            <Route path="/minhasEmissoes" element={<Dashboard />} />
+            <Route path="/emissaoEnergia" element={<EmissaoEnergia />} />
+            <Route path="/emissaoCombustivel" element={<EmissaoCombustivel />} />
+            <Route path="/usuario" element={<Usuario />} />
+            <Route path="/" element={<Navigate to="/home" replace />} />
+          </Route>
 
-        {/* Rota padrão */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Rota padrão */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
