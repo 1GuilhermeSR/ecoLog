@@ -1,16 +1,18 @@
-import { Col, DatePicker, Flex, Form, FormProps, Input, Modal, Row, Select, Spin, Typography, message } from 'antd';
-import styles from './styles.module.scss';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { IoChevronBackSharp } from 'react-icons/io5';
+import { Col, DatePicker, Flex, Form, Input, Modal, Row, Select, Typography, message, FormProps } from 'antd';
+import type { Rule } from 'antd/es/form';
 import BtnPrincipal from '../../components/geral/BtnPrincipal';
 import BtnSecundario from '../../components/geral/BtnSecundario';
-import { UsuarioDTO } from '../../dto/UsuarioDTO';
-import { IoChevronBackSharp } from "react-icons/io5";
-import { useNavigate } from 'react-router-dom';
-import { formatCpf } from '../../utils/stringUtils';
-import userService from '../../services/usuario/usuarioService';
-import estadoService from '../../services/estado/estadoService';
-import dayjs from 'dayjs';
 import Loading from '../../components/geral/Loading';
+import { useAuth } from '../../context/AuthContext';
+import estadoService from '../../services/estado/estadoService';
+import userService from '../../services/usuario/usuarioService';
+import { formatCpf, passwordValidationMessage } from '../../utils/stringUtils';
+import type { UsuarioDTO } from '../../dto/usuario/UsuarioDTO';
+import styles from './styles.module.scss';
 
 const { Text } = Typography;
 
@@ -27,11 +29,20 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
     const [estados, setEstados] = useState<any[]>([]);
+    const { syncAuth } = useAuth();
 
     const handleCpfChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
         const formatted = formatCpf(e.target.value)
         formUsuario.setFieldsValue({ cpf: formatted })
     }
+
+    const validatePasswordRule: Rule = {
+        validator: async (_rule, value) => {
+            const msg = passwordValidationMessage(value);
+            if (msg) return Promise.reject(new Error(msg));
+            return Promise.resolve();
+        },
+    };
 
     async function login() {
         try {
@@ -45,7 +56,7 @@ export default function Login() {
 
             if (response.success) {
                 messageApi.open({ type: 'success', content: 'Login realizado com sucesso!' })
-                //dorme 3 segundos para o usuário ler a mensagem
+                await syncAuth();
                 navigate('/home');
             } else {
                 messageApi.open({ type: 'warning', content: response.message || 'Email ou senha inválidos' })
@@ -57,31 +68,10 @@ export default function Login() {
         }
     }
 
-    function proximo() {
-        if (opcao == 1) {
-            formUsuario.resetFields();
-        }
-        const valores = formUsuario.getFieldsValue();
-        setDadosUsuario(prev => ({ ...prev, ...valores }));
-        setOpcao(opcao + 1);
-    }
-
-    function voltar() {
-        if (opcao == 2) {
-            formUsuario.resetFields();
-        }
-        setOpcao(opcao - 1);
-    }
-
     async function cadastrar(values: any) {
         try {
             setLoading(true);
             const dadosCompletos = { ...dadosUsuario, ...values };
-
-            
-            const estadoId = typeof dadosCompletos.estadoId === 'string'
-                ? parseInt(dadosCompletos.estadoId)
-                : dadosCompletos.estadoId;
 
             const dataNascimento = dadosCompletos.dataNascimento
                 ? dayjs(dadosCompletos.dataNascimento).format('DD/MM/YYYY')
@@ -94,13 +84,13 @@ export default function Login() {
                 cpf: cpfLimpo,
                 email: dadosCompletos.email,
                 senha: dadosCompletos.senha,
-                confirmarSenha: dadosCompletos.senha,
                 dataNascimento: dataNascimento,
-                estadoId: estadoId
+                estadoId: dadosCompletos.estadoId
             });
 
             if (response.success) {
                 messageApi.open({ type: 'success', content: 'Cadastro realizado com sucesso!' })
+                await syncAuth();
                 navigate('/home');
             } else {
                 messageApi.open({ type: 'warning', content: response.message || 'Erro ao realizar cadastro' })
@@ -125,8 +115,8 @@ export default function Login() {
     const onFinishRedefinirSenha: FormProps<UsuarioDTO>['onFinish'] = async (values) => {
         try {
             setLoading(true);
-            const response = await userService.forgotPassword(values.email);
 
+            const response = await userService.forgotPassword(values.email);
             if (response.success) {
                 messageApi.open({ type: 'success', content: 'Email de recuperação enviado! Verifique sua caixa de entrada.' })
                 setIsModalOpen(false);
@@ -141,8 +131,24 @@ export default function Login() {
         }
     };
 
+    function proximo() {
+        if (opcao == 1) {
+            formUsuario.resetFields();
+        }
+        const valores = formUsuario.getFieldsValue();
+        setDadosUsuario(prev => ({ ...prev, ...valores }));
+        setOpcao(opcao + 1);
+    }
+
+    function voltar() {
+        if (opcao == 2) {
+            formUsuario.resetFields();
+        }
+        setOpcao(opcao - 1);
+    }
+
     const onFinishFailedLogin: FormProps<UsuarioDTO>['onFinishFailed'] = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        messageApi.open({ type: 'error', content: 'Ocorreu um erro ao fazer  login\n' + errorInfo });        
     };
 
     const showModal = () => {
@@ -156,8 +162,7 @@ export default function Login() {
 
     useEffect(() => {
         estadoService.getAllEstado().then(estados => {
-            console.log('Estados carregados:', estados);
-            const estadosFormatados = estados.map(estado => ({  
+            const estadosFormatados = estados.map(estado => ({
                 label: estado.nome,
                 value: estado.id
             }));
@@ -239,7 +244,11 @@ export default function Login() {
                                 <Flex gap="middle" vertical style={{ gap: '26px' }}>
                                     <Form.Item<UsuarioDTO["nome"]>
                                         name="nome"
-                                        rules={[{ required: true, message: 'Por Favor, preencha o seu nome!' }]}
+                                        rules={[
+                                            { required: true, message: 'Por Favor, preencha o seu nome!' },
+                                            { min: 3, message: 'O nome deve ter no mínimo 3 caracteres!' },
+                                            { max: 80, message: 'O nome deve ter no máximo 80 caracteres!' }
+                                        ]}
                                         style={{ marginBottom: '0px' }}
                                     >
                                         <Input size="large" placeholder="Nome Completo" variant="underlined" />
@@ -328,7 +337,7 @@ export default function Login() {
                                         name="senha"
                                         rules={[
                                             { required: true, message: 'Por favor, preencha sua senha!' },
-                                            { min: 6, message: 'A senha deve ter no mínimo 6 caracteres!' }
+                                            validatePasswordRule
                                         ]}
                                         style={{ marginBottom: '0px' }}
                                     >

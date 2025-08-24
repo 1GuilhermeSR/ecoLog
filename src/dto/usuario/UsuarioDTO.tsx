@@ -6,6 +6,7 @@ export interface UsuarioDTO {
     dataNascimento: string;
     cpf: string;
     estadoId: number;
+    estadoNome?: string;
     email: string;
-    senha: string;
+    senha?: string;
 }

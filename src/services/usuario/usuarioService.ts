@@ -1,66 +1,21 @@
+import api, { tokenManager } from '../api';
+import { UsuarioDTO } from '../../dto/usuario/UsuarioDTO';
+import { LoginRequestDTO } from '../../dto/usuario/LoginRequestDTO';
+import { AuthResponseDTO } from '../../dto/usuario/AuthResponseDTO';
+import { RegisterRequestDTO } from '../../dto/usuario/RegisterRequestDTO';
+import { ResetPasswordRequestDTO } from '../../dto/usuario/ResetPasswordRequestDTO';
+import { ServiceResultDTO } from '../../dto/ServiceResultDTO';
 
-// src/services/authService.ts
-import api from '../api';
-import { UsuarioDTO } from '../../dto/UsuarioDTO';
-import dayjs from 'dayjs';
+class UsuarioService {
 
-interface LoginRequest {
-  email: string;
-  senha: string;
-}
-
-interface RegisterRequest {
-  nome: string;
-  cpf: string;
-  email: string;
-  senha: string;
-  confirmarSenha: string;
-  dataNascimento: string;
-  estadoId: number;
-}
-
-interface AuthResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    accessToken: string;
-    tokenType: string;
-    expiresIn: number;
-    usuario: {
-      id: number;
-      nome: string;
-      email: string;
-      dataNascimento: string;
-      estadoId: number;
-      estadoNome: string;
-    };
-  };
-}
-
-interface ForgotPasswordRequest {
-  email: string;
-}
-
-interface ResetPasswordRequest {
-  email: string;
-  token: string;
-  novaSenha: string;
-  confirmarSenha: string;
-}
-
-class AuthService {
-  // Login do usuário
-  async login(credentials: LoginRequest): Promise<AuthResponse> {
+  async login(credentials: LoginRequestDTO): Promise<AuthResponseDTO> {
     try {
-      const response = await api.post<AuthResponse>('/user/login', credentials);
+      const response = await api.post<AuthResponseDTO>('/user/login', credentials);
 
       if (response.data.success && response.data.data) {
-        // Salvar token e dados do usuário no localStorage
-        localStorage.setItem('accessToken', response.data.data.accessToken);
-        localStorage.setItem('usuario', JSON.stringify(response.data.data.usuario));
+        tokenManager.setToken(response.data.data.accessToken);
 
-        // Configurar o header Authorization para as próximas requisições
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.accessToken}`;
+        sessionStorage.setItem('usuario', JSON.stringify(response.data.data.usuario));
       }
 
       return response.data;
@@ -69,24 +24,14 @@ class AuthService {
     }
   }
 
-  // Registro de novo usuário
-  async register(userData: RegisterRequest): Promise<AuthResponse> {
+  async register(userData: RegisterRequestDTO): Promise<AuthResponseDTO> {
     try {
-      // Formatar a data para o formato esperado pelo backend (dd-MM-yyyy)
-      const formattedData = {
-        ...userData,
-        dataNascimento: this.formatDateForBackend(userData.dataNascimento)
-      };
-
-      const response = await api.post<AuthResponse>('/user/register', formattedData);
+      const response = await api.post<AuthResponseDTO>('/user/register', userData);
 
       if (response.data.success && response.data.data) {
-        // Salvar token e dados do usuário no localStorage
-        localStorage.setItem('accessToken', response.data.data.accessToken);
-        localStorage.setItem('usuario', JSON.stringify(response.data.data.usuario));
-
-        // Configurar o header Authorization
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.accessToken}`;
+        // Salva token em memória
+        tokenManager.setToken(response.data.data.accessToken);
+        sessionStorage.setItem('usuario', JSON.stringify(response.data.data.usuario));
       }
 
       return response.data;
@@ -95,45 +40,63 @@ class AuthService {
     }
   }
 
-  // Solicitar recuperação de senha
+  async editarEstado(usuario: UsuarioDTO): Promise<ServiceResultDTO> {
+    try {
+      const response = await api.put<ServiceResultDTO>(`/user/editarEstado`, usuario);
+
+      if (response.data.success) {
+        sessionStorage.setItem('usuario', JSON.stringify(response.data.data));
+      }
+
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || { success: false, message: 'Erro ao editar estado' };
+    }
+  }
+
+  async excluirConta(): Promise<ServiceResultDTO> {
+    try {
+      const response = await api.delete<ServiceResultDTO>(`/user/excluirUsuario`);
+
+      if (response.data.success) {
+        this.logout();
+      }
+
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || { success: false, message: 'Erro ao excluir conta' };
+    }
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await api.post('/user/logout');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    } finally {
+      tokenManager.clearToken();
+      sessionStorage.removeItem('usuario');
+    }
+  }
+
   async forgotPassword(email: string): Promise<any> {
     try {
-      const response = await api.post('/user/forgot-password', { email });
+      const response = await api.post('/user/forgotPassword', { email });
       return response.data;
     } catch (error: any) {
       throw error.response?.data || { success: false, message: 'Erro ao solicitar recuperação de senha' };
     }
   }
 
-  // Redefinir senha com token
-  async resetPassword(data: ResetPasswordRequest): Promise<any> {
+  async resetPassword(data: ResetPasswordRequestDTO): Promise<any> {
     try {
-      const response = await api.post('/user/reset-password', data);
+      const response = await api.post('/user/resetPassword', data);
       return response.data;
     } catch (error: any) {
       throw error.response?.data || { success: false, message: 'Erro ao redefinir senha' };
     }
   }
 
-  // Logout
-  logout(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('usuario');
-    delete api.defaults.headers.common['Authorization'];
-  }
-
-  // Verificar se o usuário está autenticado
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem('accessToken');
-  }
-
-  // Obter dados do usuário atual
-  getCurrentUser(): any {
-    const userStr = localStorage.getItem('usuario');
-    return userStr ? JSON.parse(userStr) : null;
-  }
-
-  // Validar token
   async validateToken(): Promise<boolean> {
     try {
       const response = await api.get('/user/validate');
@@ -143,36 +106,35 @@ class AuthService {
     }
   }
 
-  // Função auxiliar para formatar data
-  private formatDateForBackend(date: any): string {
-    // Se a data vier como objeto Dayjs
-    if (dayjs.isDayjs(date)) {
-      return date.format('DD/MM/YYYY');
-    }
-
-    // Se vier como string no formato DD/MM/YYYY, retorna como está
-    if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
-      return date;
-    }
-
-    // Se vier no formato YYYY-MM-DD, converte para DD/MM/YYYY
-    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      return dayjs(date).format('DD/MM/YYYY');
-    }
-
-    // Se vier no formato DD-MM-YYYY, converte para DD/MM/YYYY
-    if (typeof date === 'string' && /^\d{2}-\d{2}-\d{4}$/.test(date)) {
-      const [day, month, year] = date.split('-');
-      return `${day}/${month}/${year}`;
-    }
-
-    // Tenta converter qualquer outro formato
+  async refreshToken(): Promise<boolean> {
     try {
-      return dayjs(date).format('DD/MM/YYYY');
+      const response = await api.post('/user/refresh', {});
+
+      if (response.data.success && response.data.data) {
+        tokenManager.setToken(response.data.data.accessToken);
+        return true;
+      }
+
+      return false;
     } catch {
-      return date;
+      return false;
     }
   }
+
+  isAuthenticated(): boolean {
+    return tokenManager.hasToken();
+  }
+
+  getCurrentUser(): any {
+    const userStr = sessionStorage.getItem('usuario');
+    if(userStr != "undefined") {
+      return userStr ? JSON.parse(userStr) : null;
+    }
+    else {
+      return null;
+    }
+  }
+
 }
 
-export default new AuthService();
+export default new UsuarioService();

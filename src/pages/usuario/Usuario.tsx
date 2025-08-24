@@ -1,74 +1,126 @@
-import { Col, DatePicker, Flex, Form, Input, Row, Select } from 'antd';
+import { Col, DatePicker, Flex, Form, Input, message, Modal, Row, Select } from 'antd';
 import styles from './styles.module.scss';
 import { IoChevronBackSharp } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import BtnPrincipal from '../../components/geral/BtnPrincipal';
-import { UsuarioDTO } from '../../dto/UsuarioDTO';
+import { UsuarioDTO } from '../../dto/usuario/UsuarioDTO';
 import BtnSecundario from '../../components/geral/BtnSecundario';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, createContext } from 'react';
+import userService from '../../services/usuario/usuarioService';
 import dayjs from 'dayjs';
+import estadoService from '../../services/estado/estadoService';
+import Loading from '../../components/geral/Loading';
 
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
 const BackIcon = IoChevronBackSharp as unknown as SVGIcon;
 
+const ReachableContext = createContext<string | null>(null);
+const UnreachableContext = createContext<string | null>(null);
+const config = {
+    title: 'Deletar usuario?',
+    content: (
+        <>
+            <ReachableContext.Consumer>{(name) => `Essa ação é irreversível!`}</ReachableContext.Consumer>
+            <br />
+            <UnreachableContext.Consumer>{(name) => `Todas as suas emissões serão apagadas no processo!`}</UnreachableContext.Consumer>
+        </>
+    ),
+};
+
 export default function Usuario() {
     const navigate = useNavigate();
     const [formUsuario] = Form.useForm();
+    const dados = userService.getCurrentUser();
+    const [estados, setEstados] = useState<any[]>([]);
+    const [messageApi, contextHolder] = message.useMessage();
+    const [modal, contextHolderModal] = Modal.useModal();
+    const [loading, setLoading] = useState(false);
 
-    // useState para mockar os dados do usuário
-    const [dadosUsuario, setDadosUsuario] = useState<UsuarioDTO>({
-        id: 1,
-        email: '1guilhermesr1@email.com',
-        nome: 'Guilherme Saldanha Ribeiro',
-        dataNascimento: '21/01/2004',
-        cpf: '123.456.789-10',  
-        estadoId: 1,
-        senha:''
-    });
 
-    // Lista de estados para o dropdown
-    const estados = [
-        { value: 1, label: 'Goiás' },
-        { value: 2, label: 'São Paulo' },
-        { value: 3, label: 'Santa Catarina' },
-    ];
+    const initialValues = useMemo(() => {
+        if (!dados) return {};
 
-    // useEffect para definir os valores iniciais do formulário
+        return {
+            email: dados.email ?? '',
+            nome: dados.nome ?? '',
+            dataNascimento: dayjs(dados.dataNascimento, 'DD/MM/YYYY'),
+            cpf: (dados.cpf ?? '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
+            estadoId: dados.estadoId ?? undefined,
+        };
+    }, [dados]);
+
     useEffect(() => {
-        formUsuario.setFieldsValue({
-            email: dadosUsuario.email,
-            nome: dadosUsuario.nome,
-            dataNascimento: dayjs(dadosUsuario.dataNascimento, 'DD/MM/YYYY'),
-            cpf: dadosUsuario.cpf,
-            estadoId: dadosUsuario.estadoId
+        estadoService.getAllEstado().then(estados => {
+            const estadosFormatados = estados.map(estado => ({
+                label: estado.nome,
+                value: estado.id
+            }));
+            setEstados(estadosFormatados);
+        }).catch(error => {
+            console.error('Erro ao carregar estados:', error);
+            messageApi.open({ type: 'error', content: 'Erro ao carregar estados' });
         });
-    }, [dadosUsuario, formUsuario]);
+    }, []);
 
     function voltar() {
         navigate('/home');
     }
 
-    // Função para salvar as alterações (apenas estado pode ser alterado)
-    function salvarAlteracoes(values: any) {
-        const dadosAtualizados = {
-            ...dadosUsuario,
-            estadoId: values.estadoId
-        };
-        setDadosUsuario(dadosAtualizados);
-        console.log('Estado atualizado:', dadosAtualizados);
-        // Aqui você pode adicionar a lógica para enviar os dados para o backend
+    async function salvarAlteracoes(values: UsuarioDTO) {
+
+        try {
+            setLoading(true);
+            const selecionado = estados.find(e => e.value === values.estadoId);
+            const payload = {
+                ...dados,
+                estadoId: selecionado.value!,
+                estadoNome: selecionado.label ?? ''
+            };
+
+            const response = await userService.editarEstado(payload);
+
+            if (response.success) {
+                messageApi.open({ type: 'success', content: 'Estado atualizado com sucesso!' });
+                formUsuario.setFieldsValue({
+                    estadoId: response.data.estadoId
+                });
+            } else {
+                messageApi.open({ type: 'error', content: response.message });
+            }
+
+        } catch (error: any) {
+            messageApi.open({ type: 'error', content: error.message || 'Erro ao atualizar estado' });
+        } finally {
+            setLoading(false);
+        }
+
     }
 
-    // Função para excluir conta
-    function excluirConta() {
-        console.log('Excluindo conta do usuário:', dadosUsuario.email);
-        // Aqui você pode adicionar a lógica para excluir a conta
+    async function excluirConta() {
+        try {
+            setLoading(true);
+            const response = await userService.excluirConta();            
+            if (response.success) {
+                messageApi.open({ type: 'success', content: 'Conta excluída com sucesso!' });
+                navigate('/login', { replace: true });
+            } else {
+                messageApi.open({ type: 'error', content: response.message || 'Erro ao excluir conta' });
+            }
+        } catch (error: any) {
+            messageApi.open({ type: 'error', content: error.message || 'Erro ao excluir conta' });
+        } finally {
+            setLoading(false);
+        }
     }
+
 
     return (
         <div className={styles.main}>
             <div className={styles.container}>
-                <Row style={{  height: '8%' }}>
+                {contextHolder}
+                {contextHolderModal}
+                {loading && (<Loading />)}
+                <Row style={{ height: '8%' }}>
                     <Col className={styles.header} span={24}>
                         <BackIcon onClick={voltar} className={styles.backIcon} />
                         <span>Dados Pessoais</span>
@@ -76,12 +128,13 @@ export default function Usuario() {
                 </Row>
 
                 <Form
+                    key={dados?.id ?? 'blank'}
                     form={formUsuario}
                     name="basic"
-                    initialValues={{ remember: true }}
+                    initialValues={initialValues}
                     onFinish={salvarAlteracoes}
                     autoComplete="off"
-                    style={{height:'92%'}}
+                    style={{ height: '92%' }}
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center', gap: '3rem' }}>
                         <Row justify="center">
@@ -157,8 +210,12 @@ export default function Usuario() {
                         <Row justify="center">
                             <Col span={15}>
                                 <Flex gap="middle" vertical={false} style={{ gap: '16px' }}>
-                                    <BtnSecundario onClick={excluirConta} label='Excluir a conta' size='middle' />
-                                    <BtnPrincipal onClick={() => formUsuario.submit()} label='Salvar Alterações' size='middle' />
+                                    <BtnSecundario onClick={async () => {
+                                        const confirmed = await modal.confirm(config);
+                                        if (confirmed)
+                                            excluirConta();
+                                    }} label='Excluir a conta' size='middle' />
+                                    <BtnPrincipal onClick={() => formUsuario.submit()} htmlType='button' label='Salvar Alterações' size='middle' />
                                 </Flex>
                             </Col>
                         </Row>
