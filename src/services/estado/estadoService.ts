@@ -1,5 +1,3 @@
-
-// src/services/authService.ts
 import api from '../api';
 import { EstadoDTO } from '../../dto/estado/EstadoDTO';
 

@@ -33,17 +33,6 @@ export default function ModalEmissaoEnergia({
     }
   }, [editingItem, form]);
 
-  useEffect(() => {
-    const kwhValue = form.getFieldValue('kwhConsumido');
-    if (kwhValue && typeof kwhValue === 'number' && kwhValue > 0) {
-      const co2 = kwhValue * fatorEmissaoCO2;
-      setCo2Calculado(co2);
-    } else {
-      setCo2Calculado(0);
-    }
-  }, [form.getFieldValue('kwhConsumido'), fatorEmissaoCO2]);
-
-
   const handleKwhChange = (value: number | null) => {
     if (value && value > 0) {
       const co2 = value * fatorEmissaoCO2;
@@ -84,7 +73,11 @@ export default function ModalEmissaoEnergia({
           <span>Emissão por Energia</span>
         </div>
       }
-      closable={{ 'aria-label': 'Custom Close Button' }}
+      closable
+      afterClose={() => {
+        form.resetFields();
+        setCo2Calculado(0);
+      }}
       open={isOpen}
       onCancel={handleCancel}
       footer={[]}
