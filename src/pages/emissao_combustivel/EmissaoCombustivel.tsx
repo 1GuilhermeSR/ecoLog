@@ -1,14 +1,18 @@
-import { Col, Flex, Row, Space, Table, TableProps } from 'antd';
+import { Col, Flex, message, Row, Space, Table, TableProps } from 'antd';
 import styles from './styles.module.scss';
 import { IoChevronBackSharp } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import BtnPrincipal from '../../components/geral/BtnPrincipal';
 import Input, { SearchProps } from 'antd/es/input';
 import { EmissaoCombustivelDTO } from '../../dto/emissao_combustivel/EmissaoCombustivelDTO';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import ModalEmissaoCombustivel from '../../components/emissaoCombustivel/ModalEmissaoCombustivel';
+import Loading from '../../components/geral/Loading';
+import emissaoCombustivelService from '../../services/emissao_combustivel/emissaoCombustivelService';
+import { removeById, sortInitialByDateDesc, upsertByIdMaintainDateDesc } from '../../utils/listOrder';
+import { EmissaoCombustivelUpsertDTO } from '../../dto/emissao_combustivel/emissaoCombustivelUpsertDTO';
 
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
 const BackIcon = IoChevronBackSharp as unknown as SVGIcon;
@@ -18,79 +22,59 @@ export default function EmissaoCombustivel() {
   const { Search } = Input;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [emissoes, setEmissoes] = useState<EmissaoCombustivelDTO[]>([
-    {
-      id: 1,
-      data: dayjs('02/01/2025', 'DD/MM/YYYY'),
-      kmPercorrido: 50,
-      combustivel: 'Etanol',
-      mediaKm: 10,
-      co2Emitido: 4,
-      IdCombustivel: 1,
-      fatorEmissao: 1.533
-    },
-    {
-      id: 2,
-      data: dayjs('02/01/2025', 'DD/MM/YYYY'),
-      kmPercorrido: 50,
-      combustivel: 'Etanol',
-      mediaKm: 10,
-      co2Emitido: 4,
-      IdCombustivel: 1,
-      fatorEmissao: 1.533
-    },
-    {
-      id: 3,
-      data: dayjs('02/01/2025', 'DD/MM/YYYY'),
-      kmPercorrido: 50,
-      combustivel: 'Gasolina',
-      mediaKm: 12,
-      co2Emitido: 19.9,
-      IdCombustivel: 2,
-      fatorEmissao: 2.318
-    },
-    {
-      id: 4,
-      data: dayjs('02/01/2025', 'DD/MM/YYYY'),
-      kmPercorrido: 50,
-      combustivel: 'Gasolina',
-      mediaKm: 12,
-      co2Emitido: 19.9,
-      IdCombustivel: 2,
-      fatorEmissao: 2.318
-    },
-  ]);
-  const [emissoesFiltradas, setEmissoesFiltradas] = useState<EmissaoCombustivelDTO[]>([]);
+  const [emissoes, setEmissoes] = useState<EmissaoCombustivelDTO[]>([]);
   const [termoBusca, setTermoBusca] = useState<string>('');
   const [currentItem, setCurrentItem] = useState<EmissaoCombustivelDTO | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const fetchEmissoes = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await emissaoCombustivelService.getEmissaoByUser();
+      if (response.success && Array.isArray(response.data)) {
+        setEmissoes(sortInitialByDateDesc(response.data));
+      } else {
+        setEmissoes([]);
+      }
+    } catch (e) {
+      console.error('Erro ao carregar emissões:', e);
+      setEmissoes([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    setEmissoesFiltradas(emissoes);
-  }, [emissoes]);
+    fetchEmissoes();
 
-  const realizarBusca = (termo: string) => {
-    setTermoBusca(termo);
-    if (!termo.trim()) {
-      setEmissoesFiltradas(emissoes);
-      return;
-    }
-    const lower = termo.toLowerCase().trim();
-    const resultados = emissoes.filter(item => {
-      const dataFmt = item.data.format('DD/MM/YYYY').toLowerCase();
-      const partes = dataFmt.split('/');
-      return (
-        dataFmt.includes(lower) ||
-        partes.some(p => p.includes(lower)) ||
-        item.data.format('MMMM YYYY').toLowerCase().includes(lower) ||
-        item.data.format('MMM YYYY').toLowerCase().includes(lower) ||
-        item.kmPercorrido.toString().includes(lower) ||
-        item.combustivel.toLowerCase().includes(lower) ||
-        item.mediaKm.toString().includes(lower) ||
-        item.co2Emitido.toString().includes(lower)
-      );
+  }, [fetchEmissoes]);
+
+  const emissoesFiltradas = useMemo(() => {
+    const termo = termoBusca.toLowerCase().trim();
+    if (!termo) return emissoes;
+
+    return emissoes.filter((emissao) => {
+      const dataStr = emissao.data?.isValid?.() ? emissao.data.format('DD/MM/YYYY') : '';
+      const matchData = dataStr.toLowerCase().includes(termo);
+
+      const matchKmPerc = String(emissao.kmPercorrido ?? '').toLowerCase().includes(termo);
+      const matchMediaKm = String(emissao.mediaKm ?? '').toLowerCase().includes(termo);
+      const matchCo2 = String(emissao.co2Emitido ?? '').toLowerCase().includes(termo);
+      const matchComb = (emissao.nomeCombustivel ?? '').toLowerCase().includes(termo);
+
+      const matchDataParcial = dataStr
+        ? dataStr.split('/').some((p) => p.toLowerCase().includes(termo))
+        : false;
+
+      const matchMesNome = emissao.data?.isValid?.()
+        ? emissao.data.format('MMMM YYYY').toLowerCase().includes(termo) ||
+        emissao.data.format('MMM YYYY').toLowerCase().includes(termo)
+        : false;
+
+      return matchData || matchKmPerc || matchMediaKm || matchCo2 || matchComb || matchDataParcial || matchMesNome;
     });
-    setEmissoesFiltradas(resultados);
-  };
+  }, [emissoes, termoBusca]);
 
   const novo = () => {
     setCurrentItem(null);
@@ -102,8 +86,22 @@ export default function EmissaoCombustivel() {
     setIsModalOpen(true);
   };
 
-  const excluir = (record: EmissaoCombustivelDTO) => {
-    setEmissoes(emissoes.filter(e => e.id !== record.id));
+  const excluir = async (record: EmissaoCombustivelDTO) => {
+    if (!record.id) return;
+    setLoading(true);
+    try {
+      const resp = await emissaoCombustivelService.excluirEmissaoCombustivel(record.id);
+      if (resp.success) {
+        setEmissoes(prev => removeById(prev, record.id!));
+        messageApi.open({ type: 'success', content: 'Emissão excluída com sucesso!' });
+      } else {
+        messageApi.open({ type: 'error', content: resp.message ?? 'Não foi possível excluir a emissão.' });
+      }
+    } catch (err: any) {
+      messageApi.open({ type: 'error', content: err?.message ?? 'Erro ao excluir a emissão.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleModalClose = () => {
@@ -111,21 +109,62 @@ export default function EmissaoCombustivel() {
     setCurrentItem(null);
   };
 
-  const handleSave = (values: EmissaoCombustivelDTO) => {
-    console.log('Valores recebidos do modal:', values);
+  const handleSave = async (values: EmissaoCombustivelDTO) => {
+    const isEditing = !!currentItem?.id;
+    var sucesso = false;
 
-    if (currentItem?.id) {
-      // Editando item existente
-      setEmissoes(emissoes.map(e =>
-        e.id === currentItem.id ? { ...values, id: currentItem.id } : e
-      ));
-    } else {
-      // Criando novo item
-      const maxId = emissoes.reduce((m, e) => (e.id! > m ? e.id! : m), 0);
-      const novoItem = { ...values, id: maxId + 1 };
-      console.log('Novo item a ser adicionado:', novoItem);
-      setEmissoes(prevEmissoes => [...prevEmissoes, novoItem]);
+    const upsert: EmissaoCombustivelUpsertDTO = {
+      id: isEditing ? currentItem!.id : 0,
+      data: values.data.format('DD/MM/YYYY'),
+      kmPercorrido: Number(values.kmPercorrido),
+      idCombustivel: Number(values.idCombustivel),
+      mediaKm: Number(values.mediaKm),
+      co2Emitido: Number(values.co2Emitido?.toFixed?.(4) ?? 0),
+      fatorEmissao: Number(values.fatorEmissao ?? 0),
+    };
+
+    if (isEditing) {
+      const response = await emissaoCombustivelService.editarEmissaoCombustivel(upsert);
+      if (response.success) {
+        messageApi.open({ type: 'success', content: 'Emissão editada com sucesso!' });
+        sucesso = true;
+      }
+      else {
+        messageApi.open({ type: 'error', content: 'Erro ao editar emissão!\n' + response.message });
+      }
     }
+    else {
+      const response = await emissaoCombustivelService.gravarEmissaoCombustivel(upsert);
+      if (response.success) {
+        messageApi.open({ type: 'success', content: 'Emissão gravada com sucesso!' });
+        sucesso = true;
+      }
+      else {
+        messageApi.open({ type: 'error', content: 'Erro ao gravar emissão!\n' + response.message });
+      }
+    }
+
+    if (sucesso) {
+      const rowForTable: EmissaoCombustivelDTO = {
+        id: upsert.id ?? (emissoes.reduce((m, e) => (e.id ?? 0) > m ? (e.id ?? 0) : m, 0) + 1),
+        data: dayjs(upsert.data, 'DD/MM/YYYY'),
+        idCombustivel: upsert.idCombustivel,
+        nomeCombustivel: values.nomeCombustivel ?? currentItem?.nomeCombustivel ?? '',
+        mediaKm: upsert.mediaKm,
+        kmPercorrido: upsert.kmPercorrido,
+        co2Emitido: upsert.co2Emitido!,
+        fatorEmissao: upsert.fatorEmissao,
+        idEstado: currentItem?.idEstado,
+        idUsuario: currentItem?.idUsuario,
+      };
+
+      setEmissoes(prev => upsertByIdMaintainDateDesc(prev, rowForTable));
+
+
+      setIsModalOpen(false);
+      setCurrentItem(null);
+    }
+
     setIsModalOpen(false);
     setCurrentItem(null);
   };
@@ -150,7 +189,7 @@ export default function EmissaoCombustivel() {
       dataIndex: 'combustivel',
       key: 'combustivel',
       align: 'center',
-      render: (_, r) => <span className={styles.itemTable}>{r.combustivel}</span>,
+      render: (_, r) => <span className={styles.itemTable}>{r.nomeCombustivel}</span>,
     },
     {
       title: <span className={styles.headerTable}>Média Km</span>,
@@ -179,8 +218,8 @@ export default function EmissaoCombustivel() {
     },
   ];
 
-  const onSearch: SearchProps['onSearch'] = realizarBusca;
-  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => realizarBusca(e.target.value);
+  const onSearch: SearchProps['onSearch'] = (value) => setTermoBusca(value);
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setTermoBusca(e.target.value);
 
   return (
     <div className={styles.main}>
@@ -192,6 +231,8 @@ export default function EmissaoCombustivel() {
       </Row>
 
       <div className={styles.container}>
+        {loading && (<Loading />)}
+        {contextHolder}
         <Row>
           <Col span={24}>
             <Flex justify="space-between" vertical={false}>

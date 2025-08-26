@@ -2,10 +2,12 @@ import { Dayjs } from 'dayjs';
 
 export interface EmissaoCombustivelDTO {
   id?: number;
-  data: Dayjs;          
+  data: Dayjs;
+  idEstado?: number;
+  idUsuario?: number;
   kmPercorrido: number;
-  IdCombustivel?: number;
-  combustivel: string;
+  idCombustivel?: number;
+  nomeCombustivel?: string;
   mediaKm: number;   
   co2Emitido: number;   
   fatorEmissao: number;   
