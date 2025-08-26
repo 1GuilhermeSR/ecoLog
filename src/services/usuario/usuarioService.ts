@@ -19,8 +19,8 @@ class UsuarioService {
       }
 
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data || { success: false, message: 'Erro ao realizar login' };
+    } catch (error) {
+      throw { success: false, message: 'Erro ao realizar login\n', error };
     }
   }
 
@@ -35,8 +35,8 @@ class UsuarioService {
       }
 
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data || { success: false, message: 'Erro ao realizar cadastro' };
+    } catch (error) {
+      throw { success: false, message: 'Erro ao realizar cadastro\n', error };
     }
   }
 
@@ -49,8 +49,8 @@ class UsuarioService {
       }
 
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data || { success: false, message: 'Erro ao editar estado' };
+    } catch (error) {
+      throw { success: false, message: 'Erro ao editar estado\n', error };
     }
   }
 
@@ -63,8 +63,8 @@ class UsuarioService {
       }
 
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data || { success: false, message: 'Erro ao excluir conta' };
+    } catch (error) {
+      throw { success: false, message: 'Erro ao excluir conta\n', error };
     }
   }
 
@@ -92,8 +92,8 @@ class UsuarioService {
     try {
       const response = await api.post('/user/resetPassword', data);
       return response.data;
-    } catch (error: any) {
-      throw error.response?.data || { success: false, message: 'Erro ao redefinir senha' };
+    } catch (error) {
+      throw { success: false, message: 'Erro ao redefinir senha\n', error };
     }
   }
 

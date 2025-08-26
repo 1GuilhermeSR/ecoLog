@@ -2,7 +2,11 @@ import { Dayjs } from 'dayjs';
 
 export interface EmissaoEnergiaDTO {
   id?: number;
-  data: Dayjs;          
-  kwhConsumido: number; 
-  co2Emitido: number;   
+  idUsuario?: number;
+  data: Dayjs;
+  idEnergia?: number;
+  idEstado?: number;
+  fatorEmissao?: number;
+  kwhConsumido: number;
+  co2Emitido: number;
 }
