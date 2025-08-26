@@ -1,6 +1,6 @@
 
 export interface CombustivelDTO {
   id: number;
-  combustivel: string;
+  nome: string;
   fatorEmissao: number;
 }

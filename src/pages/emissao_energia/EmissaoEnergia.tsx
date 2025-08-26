@@ -189,12 +189,8 @@ export default function EmissaoEnergia() {
                     idEstado: currentItem?.idEstado,
                     idUsuario: currentItem?.idUsuario,
                 };
-
-                if (isEditing) {
-                    setEmissoes(prev => upsertByIdMaintainDateDesc(prev, rowForTable));
-                } else {
-                    setEmissoes(prev => upsertByIdMaintainDateDesc(prev, rowForTable));
-                }
+                
+                setEmissoes(prev => upsertByIdMaintainDateDesc(prev, rowForTable));
 
                 setIsModalOpen(false);
                 setCurrentItem(null);
