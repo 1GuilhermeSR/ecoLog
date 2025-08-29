@@ -1,10 +1,7 @@
 import { ServiceResultDTO } from "../../dto/ServiceResultDTO";
 import api from '../api';
 import { normalizeDate } from '../../utils/dateUtils';
-import { EmissaoCombustivelDTO } from "../../dto/emissao_combustivel/EmissaoCombustivelDTO";
-import { EmissaoEnergiaUpsertDTO } from "../../dto/emissao_energia/EmissaoEnergiaUpsertDTO";
 import { EmissaoCombustivelUpsertDTO } from "../../dto/emissao_combustivel/emissaoCombustivelUpsertDTO";
-import { de } from "@faker-js/faker/.";
 
 class EmissaoCombustivelService {
 
