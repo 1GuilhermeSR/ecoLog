@@ -13,7 +13,7 @@ interface ButtonProps {
 }
 
 const BtnPrincipal: React.FC<ButtonProps> = ({ label, onClick = (function(){}), size, disabled = false, htmlType = 'submit',  width = '100%' }) => (
-    <Button style={{ backgroundColor: '#175E73', width }} type="primary" htmlType={htmlType} size={size} onClick={onClick}>
+    <Button style={{ backgroundColor: '#175E73', width }} type="primary" htmlType={htmlType} size={size} onClick={onClick} disabled={disabled}>
         {label}
     </Button>
 );

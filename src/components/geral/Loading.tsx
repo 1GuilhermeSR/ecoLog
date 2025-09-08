@@ -15,7 +15,8 @@ export default function Loading() {
             left: 0,
             zIndex: 9999
         }}>
-            <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+            {/* Removido o atributo 'spin' que estava causando o erro */}
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} />} />
         </div>
     );
 }
