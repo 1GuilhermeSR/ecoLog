@@ -3,7 +3,8 @@ import styles from './styles.module.scss';
 import { IoChevronBackSharp } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 import BtnPrincipal from '../../components/geral/BtnPrincipal';
-import Input, { SearchProps } from 'antd/es/input';
+import { Input } from 'antd';
+import type { SearchProps } from 'antd/es/input';
 import { EmissaoEnergiaDTO } from '../../dto/emissao_energia/EmissaoEnergiaDTO';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
@@ -189,7 +190,7 @@ export default function EmissaoEnergia() {
                     idEstado: currentItem?.idEstado,
                     idUsuario: currentItem?.idUsuario,
                 };
-                
+
                 setEmissoes(prev => upsertByIdMaintainDateDesc(prev, rowForTable));
 
                 setIsModalOpen(false);

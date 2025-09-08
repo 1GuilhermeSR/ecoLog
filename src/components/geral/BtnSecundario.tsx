@@ -11,7 +11,7 @@ interface ButtonProps {
 }
 
 const BtnSecundario: React.FC<ButtonProps> = ({ label, onClick, size, disabled = false }) => (
-    <Button size={size} onClick={onClick}>
+    <Button size={size} onClick={onClick} disabled={disabled}>
         {label}
     </Button>
 );
