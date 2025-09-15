@@ -1,4 +1,4 @@
-import { Carousel, Col, Flex, Modal, Row, Spin, Tooltip } from "antd";
+import { Carousel, Col, Modal, Row, Spin, Tooltip } from "antd";
 import styles from './styles.module.scss';
 import { GiBrazil } from "react-icons/gi";
 import { SlGraph } from "react-icons/sl";
@@ -6,7 +6,6 @@ import { BsFuelPump } from "react-icons/bs";
 import { TbPlusMinus } from "react-icons/tb";
 import { BsQuestionCircle } from "react-icons/bs";
 import { ResumoDTO } from "../../dto/minhas_emissoes/ResumoDTO";
-import Loading from "../geral/Loading";
 import { LoadingOutlined } from "@ant-design/icons";
 
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
@@ -22,15 +21,6 @@ interface ResumoDashboardProps {
     loadingModal: boolean;
     onClose: () => void;
 }
-
-const contentStyle: React.CSSProperties = {
-    margin: 0,
-    height: '160px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
-};
 
 export default function Resumo({
     isOpen,

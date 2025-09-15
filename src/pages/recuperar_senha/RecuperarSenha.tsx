@@ -1,4 +1,4 @@
-import { Col, Form, FormProps, Input, Row, message, Typography, Alert, Modal } from 'antd';
+import { Col, Form, FormProps, Input, Row, message, Alert, Modal } from 'antd';
 import styles from './styles.module.scss';
 import { Rule } from 'antd/es/form';
 import { passwordValidationMessage } from '../../utils/stringUtils';

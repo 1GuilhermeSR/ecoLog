@@ -1,5 +1,4 @@
 import { Navigate } from 'react-router-dom';
-import userService from '../services/usuario/usuarioService';
 import { useAuth } from '../context/AuthContext';
 import Loading from '../components/geral/Loading';
 import { tokenManager } from '../services/api';
