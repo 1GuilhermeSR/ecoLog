@@ -7,7 +7,7 @@ import { TbPlusMinus } from "react-icons/tb";
 import { BsQuestionCircle } from "react-icons/bs";
 import { ResumoDTO } from "../../dto/minhas_emissoes/ResumoDTO";
 import { LoadingOutlined } from "@ant-design/icons";
-
+import { Grid } from 'antd';
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
 const IconBrasil = GiBrazil as unknown as SVGIcon;
 const IconGraph = SlGraph as unknown as SVGIcon;
@@ -15,6 +15,7 @@ const IconCombustivel = BsFuelPump as unknown as SVGIcon;
 const IconMedia = TbPlusMinus as unknown as SVGIcon;
 const IconInterrogacao = BsQuestionCircle as unknown as SVGIcon;
 
+const { useBreakpoint } = Grid;
 interface ResumoDashboardProps {
     isOpen: boolean;
     resumoDTO: ResumoDTO;
@@ -28,6 +29,8 @@ export default function Resumo({
     loadingModal,
     onClose
 }: ResumoDashboardProps) {
+    const screens = useBreakpoint();
+    const isXs = !screens.sm;
 
     return (
 
@@ -55,7 +58,7 @@ export default function Resumo({
             open={isOpen}
             onCancel={onClose}
             footer={[]}
-            width={'40vw'}
+            width={isXs ? '90vw' : '40vw'}
         >
             {loadingModal ?
                 (<div style={{

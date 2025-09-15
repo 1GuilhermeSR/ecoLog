@@ -9,6 +9,12 @@
         border: 1px solid rgba(255, 255, 255, 0.3);
         overflow: hidden;
 
+        @media (max-width: 768px) {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0px;
+        }
+
         &::before {
             content: '';
             position: absolute;
@@ -32,6 +38,12 @@
             flex-direction: column;
             width: 75vw;
             height: 75vh;
+
+            @media (max-width: 768px) {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0px;
+            }
 
             .header {
                 display: flex;
@@ -59,6 +71,7 @@
             .body {
                 height: 90%;
                 padding: 26px;
+                overflow-x: auto;
 
                 .card {
                     display: flex;
@@ -67,6 +80,10 @@
                     background-color: white;
                     border-radius: 6px;
                     padding: 12px;
+
+                    @media (max-width: 768px) {
+                        height: 80%;
+                    }
 
                     .containerFiltros {
                         width: 100%;
@@ -79,14 +96,14 @@
                         }
 
                         .drpFiltro {
-                            span{
+                            span {
                                 color: #8D8D8D;
                                 font-weight: 600;
                             }
                         }
                     }
 
-                    .containerGrafico{
+                    .containerGrafico {
                         display: flex;
                         justify-content: center;
                         align-items: center;

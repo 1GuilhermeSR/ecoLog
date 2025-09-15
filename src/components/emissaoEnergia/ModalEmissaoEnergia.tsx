@@ -115,7 +115,15 @@ export default function ModalEmissaoEnergia({
                   <Form.Item<EmissaoEnergiaDTO["kwhConsumido"]>
                     layout="vertical"
                     name="kwhConsumido"
-                    rules={[{ required: true, message: 'Por favor, informe o KwH consumido corretamente!' }]}
+                    rules={[
+                      { required: true, message: 'Por favor, informe o kWh consumido corretamente!' },
+                      {
+                        validator: (_, value) =>
+                          value != null && Number(value) > 0
+                            ? Promise.resolve()
+                            : Promise.reject(new Error('kWh deve ser maior que 0.')),
+                      },
+                    ]}
                   >
                     <InputNumber
                       className={styles.inputKwh}

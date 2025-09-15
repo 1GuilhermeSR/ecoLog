@@ -16,10 +16,12 @@ import Loading from '../../components/geral/Loading';
 import { EnergiaDTO } from '../../dto/energia/EnergiaDTO';
 import { EmissaoEnergiaUpsertDTO } from '../../dto/emissao_energia/EmissaoEnergiaUpsertDTO';
 import { sortInitialByDateDesc, upsertByIdMaintainDateDesc, removeById } from '../../utils/listOrder';
-
+import { Grid } from 'antd';
 
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
 const BackIcon = IoChevronBackSharp as unknown as SVGIcon;
+
+const { useBreakpoint } = Grid;
 
 export default function EmissaoEnergia() {
     const navigate = useNavigate();
@@ -31,6 +33,15 @@ export default function EmissaoEnergia() {
     const [termoBusca, setTermoBusca] = useState<string>('');
     const [currentItem, setCurrentItem] = useState<EmissaoEnergiaDTO | null>(null);
     const [messageApi, contextHolder] = message.useMessage();
+
+    const screens = useBreakpoint();
+    const pageSize = useMemo(() => {
+        if (screens.xs) return 9;  // Celulares comuns
+        return 7;
+    }, [screens]);
+    const [current, setCurrent] = useState(1);
+
+    useEffect(() => setCurrent(1), [termoBusca, pageSize]);
 
     const fetchEmissoes = useCallback(async () => {
         setLoading(true);
@@ -236,6 +247,7 @@ export default function EmissaoEnergia() {
             title: <span className={styles.headerTable}>Ação</span>,
             key: 'action',
             align: 'center',
+            fixed: 'right',
             render: (_, record) => (
                 <Space size="middle">
                     <EditOutlined className={styles.editIcon} onClick={() => editar(record)} />
@@ -297,7 +309,9 @@ export default function EmissaoEnergia() {
                             dataSource={emissoesFiltradas}
                             size="middle"
                             pagination={{
-                                pageSize: 6,
+                                current,
+                                onChange: (p) => setCurrent(p),
+                                pageSize,
                                 showSizeChanger: false,
                                 showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} registros`,
                             }}

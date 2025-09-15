@@ -20,7 +20,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Resumo from '../../components/resumoDashboard/Resumo';
 import MinhasEmissoesService from '../../services/minhas_emissoes/MinhasEmissoesService';
 import { ResumoDTO } from '../../dto/minhas_emissoes/ResumoDTO';
-
+import { Grid } from 'antd';
+const { useBreakpoint } = Grid;
 // Registrando os componentes necessários para gráfico de linha e doughnut
 ChartJS.register(
     CategoryScale,
@@ -76,6 +77,8 @@ export default function Dashboard() {
     const [loadingModal, setLoadingModal] = useState(false);
     const [isModalOpen, setIsModalOPen] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
+    const screens = useBreakpoint();
+    const isXs = !screens.sm;
     const mesesDisponiveis = [
         { value: '1', label: 'Janeiro' },
         { value: '2', label: 'Fevereiro' },
@@ -239,11 +242,11 @@ export default function Dashboard() {
                 </div>
 
                 <div className={styles.body}>
-                    <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <Col span={9} style={{ height: '100%' }}>
+                    <Row gutter={[16, 16]} style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                        <Col xs={24} lg={9} style={{ height: isXs ? '80%' : '100%' }}>
                             <div className={styles.card}>
                                 <div className={styles.containerFiltros}>
-                                    <Row>
+                                    <Row >
                                         <Col span={12}>
                                             <span className={styles.label}>Ano:</span>
                                             <Select
@@ -287,7 +290,7 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </Col>
-                        <Col span={13} style={{ height: '100%' }}>
+                        <Col xs={24} lg={13} style={{ height: isXs ? '80%' : '100%' }}>
                             <div className={styles.card}>
                                 <div className={styles.containerFiltros}>
                                     <Row>
@@ -311,7 +314,7 @@ export default function Dashboard() {
                                     </Row>
                                 </div>
 
-                                <div className={styles.containerGrafico} style={{ height: '100%' }}>
+                                <div className={styles.containerGrafico} style={{ height: '100%'}}>
                                     <Line options={lineOptions} data={lineData} />
                                 </div>
                             </div>
@@ -320,7 +323,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className={styles.footer}>
-                    <BtnPrincipal onClick={abrirModal} label='Ver Resumo' size='middle' width={'10%'} />
+                    <BtnPrincipal onClick={abrirModal} label='Ver Resumo' size='middle' width={isXs ? '28%' : '12%'} />
                 </div>
             </div>
 

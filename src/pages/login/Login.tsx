@@ -148,7 +148,7 @@ export default function Login() {
     }
 
     const onFinishFailedLogin: FormProps<UsuarioDTO>['onFinishFailed'] = (errorInfo) => {
-        messageApi.open({ type: 'error', content: 'Ocorreu um erro ao fazer  login\n' + errorInfo });        
+        messageApi.open({ type: 'error', content: 'Ocorreu um erro ao fazer  login\n' + errorInfo });
     };
 
     const showModal = () => {
@@ -179,25 +179,148 @@ export default function Login() {
             <div className={styles.container}>
                 {contextHolder}
                 {loading && (<Loading />)}
-                <Row style={{ marginTop: '24px', marginBottom: '48px' }}>
-                    <Col className={styles.header} span={24}>
-                        {opcao > 1 && <BackIcon onClick={voltar} className={styles.backIcon} />}
-                        <img src="/ecoLog_logo.png" alt="ecoLog" className={styles.logo} />
-                    </Col>
-                </Row>
+                
+                <div className={styles.header}>
+                    {opcao > 1 && <BackIcon onClick={voltar} className={styles.backIcon} />}
+                    <img src="/ecoLog_logo.png" alt="ecoLog" className={styles.logo} />
+                </div>
 
-                <Form
-                    form={formUsuario}
-                    name="basic"
-                    initialValues={{ remember: true }}
-                    onFinish={onFinishLogin}
-                    onFinishFailed={onFinishFailedLogin}
-                    autoComplete="off"
-                >
-                    {opcao == 1 && (
-                        <>
+                <div className={styles.content}>
+                    <Form
+                        form={formUsuario}
+                        name="basic"
+                        initialValues={{ remember: true }}
+                        onFinish={onFinishLogin}
+                        onFinishFailed={onFinishFailedLogin}
+                        autoComplete="off"
+                    >
+                        {opcao == 1 && (
+                            <>
+                                <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Col style={{ display: 'flex', flexDirection: 'column', gap: '2px' }} span={15}>
+                                        <Flex gap="middle" vertical style={{ gap: '26px' }}>
+                                            <Form.Item<UsuarioDTO["email"]>
+                                                name="email"
+                                                rules={[
+                                                    { required: true, message: 'Por favor, preencha seu email!' },
+                                                    { type: 'email', message: 'Email inválido!' }
+                                                ]}
+                                                style={{ marginBottom: '0px' }}
+                                            >
+                                                <Input size="large" placeholder="Email@" variant="underlined" />
+                                            </Form.Item>
+
+                                            <Form.Item<UsuarioDTO["senha"]>
+                                                name="senha"
+                                                rules={[{ required: true, message: 'Por favor, preencha sua senha!' }]}
+                                            >
+                                                <Input.Password size="large" placeholder="Senha" variant="underlined" />
+                                            </Form.Item>
+                                        </Flex>
+
+                                        <Flex gap="middle" vertical style={{ gap: '16px' }}>
+                                            <Form.Item label={null} style={{ marginBottom: '0px' }}>
+                                                <BtnPrincipal
+                                                    label='Login'
+                                                    htmlType="submit"
+                                                    size='middle'
+                                                    disabled={loading}
+                                                />
+                                            </Form.Item>
+
+                                            <BtnSecundario label='Cadastrar' onClick={proximo} size='middle' disabled={loading} />
+                                            <Text type="secondary" onClick={showModal} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                                                Esqueceu a senha?
+                                            </Text>
+                                        </Flex>
+                                    </Col>
+                                </Row>
+                            </>
+                        )}
+
+                        {opcao == 2 && (
                             <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
-                                <Col style={{ display: 'flex', flexDirection: 'column', gap: '2px' }} span={15}>
+                                <Col style={{ display: 'flex', flexDirection: 'column', gap: '26px' }} span={15}>
+                                    <Flex gap="middle" vertical style={{ gap: '26px' }}>
+                                        <Form.Item<UsuarioDTO["nome"]>
+                                            name="nome"
+                                            rules={[
+                                                { required: true, message: 'Por Favor, preencha o seu nome!' },
+                                                { min: 3, message: 'O nome deve ter no mínimo 3 caracteres!' },
+                                                { max: 80, message: 'O nome deve ter no máximo 80 caracteres!' }
+                                            ]}
+                                            style={{ marginBottom: '0px' }}
+                                        >
+                                            <Input size="large" placeholder="Nome Completo" variant="underlined" />
+                                        </Form.Item>
+
+                                        <Form.Item<UsuarioDTO["dataNascimento"]>
+                                            name="dataNascimento"
+                                            rules={[{ required: true, message: 'Por Favor, preencha sua data de nascimento!' }]}
+                                            style={{ marginBottom: '0px' }}
+                                        >
+                                            <DatePicker
+                                                format="DD/MM/YYYY"
+                                                size='large'
+                                                style={{ width: '100%' }}
+                                                placeholder="Data de Nascimento"
+                                                variant="underlined"
+                                            />
+                                        </Form.Item>
+
+                                        <Form.Item<UsuarioDTO["cpf"]>
+                                            name="cpf"
+                                            rules={[
+                                                { required: true, message: 'Por Favor, preencha seu CPF!' },
+                                                { len: 14, message: 'CPF inválido!' }
+                                            ]}
+                                            style={{ marginBottom: '0px' }}
+                                        >
+                                            <Input
+                                                size="large"
+                                                onChange={handleCpfChange}
+                                                placeholder="CPF"
+                                                variant="underlined"
+                                                maxLength={14}
+                                            />
+                                        </Form.Item>
+
+                                        <Form.Item<UsuarioDTO["estadoId"]>
+                                            name="estadoId"
+                                            rules={[{ required: true, message: 'Por Favor, informe seu estado de residência!' }]}
+                                            style={{ marginBottom: '0px' }}
+                                        >
+                                            <Select
+                                                showSearch
+                                                placeholder="Estado de Residência"
+                                                variant="underlined"
+                                                style={{ flex: 1 }}
+                                                filterSort={(optionA, optionB) =>
+                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                }
+                                                optionFilterProp="label"
+                                                options={estados}
+                                            />
+                                        </Form.Item>
+                                    </Flex>
+
+                                    <Flex gap="middle" vertical style={{ gap: '16px' }}>
+                                        <Form.Item label={null} style={{ marginBottom: '0px' }}>
+                                            <BtnPrincipal
+                                                label='Próximo'
+                                                htmlType="submit"
+                                                size='middle'
+                                                disabled={loading}
+                                            />
+                                        </Form.Item>
+                                    </Flex>
+                                </Col>
+                            </Row>
+                        )}
+
+                        {opcao == 3 && (
+                            <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
+                                <Col style={{ display: 'flex', flexDirection: 'column', gap: '26px' }} span={15}>
                                     <Flex gap="middle" vertical style={{ gap: '26px' }}>
                                         <Form.Item<UsuarioDTO["email"]>
                                             name="email"
@@ -212,7 +335,11 @@ export default function Login() {
 
                                         <Form.Item<UsuarioDTO["senha"]>
                                             name="senha"
-                                            rules={[{ required: true, message: 'Por favor, preencha sua senha!' }]}
+                                            rules={[
+                                                { required: true, message: 'Por favor, preencha sua senha!' },
+                                                validatePasswordRule
+                                            ]}
+                                            style={{ marginBottom: '0px' }}
                                         >
                                             <Input.Password size="large" placeholder="Senha" variant="underlined" />
                                         </Form.Item>
@@ -221,144 +348,18 @@ export default function Login() {
                                     <Flex gap="middle" vertical style={{ gap: '16px' }}>
                                         <Form.Item label={null} style={{ marginBottom: '0px' }}>
                                             <BtnPrincipal
-                                                label='Login'
+                                                label='Cadastrar'
                                                 htmlType="submit"
                                                 size='middle'
                                                 disabled={loading}
                                             />
                                         </Form.Item>
-
-                                        <BtnSecundario label='Cadastrar' onClick={proximo} size='middle' disabled={loading} />
-                                        <Text type="secondary" onClick={showModal} style={{ cursor: 'pointer', userSelect: 'none' }}>
-                                            Esqueceu a senha?
-                                        </Text>
                                     </Flex>
                                 </Col>
                             </Row>
-                        </>
-                    )}
-
-                    {opcao == 2 && (
-                        <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
-                            <Col style={{ display: 'flex', flexDirection: 'column', gap: '26px' }} span={15}>
-                                <Flex gap="middle" vertical style={{ gap: '26px' }}>
-                                    <Form.Item<UsuarioDTO["nome"]>
-                                        name="nome"
-                                        rules={[
-                                            { required: true, message: 'Por Favor, preencha o seu nome!' },
-                                            { min: 3, message: 'O nome deve ter no mínimo 3 caracteres!' },
-                                            { max: 80, message: 'O nome deve ter no máximo 80 caracteres!' }
-                                        ]}
-                                        style={{ marginBottom: '0px' }}
-                                    >
-                                        <Input size="large" placeholder="Nome Completo" variant="underlined" />
-                                    </Form.Item>
-
-                                    <Form.Item<UsuarioDTO["dataNascimento"]>
-                                        name="dataNascimento"
-                                        rules={[{ required: true, message: 'Por Favor, preencha sua data de nascimento!' }]}
-                                        style={{ marginBottom: '0px' }}
-                                    >
-                                        <DatePicker
-                                            format="DD/MM/YYYY"
-                                            size='large'
-                                            style={{ width: '100%' }}
-                                            placeholder="Data de Nascimento"
-                                            variant="underlined"
-                                        />
-                                    </Form.Item>
-
-                                    <Form.Item<UsuarioDTO["cpf"]>
-                                        name="cpf"
-                                        rules={[
-                                            { required: true, message: 'Por Favor, preencha seu CPF!' },
-                                            { len: 14, message: 'CPF inválido!' }
-                                        ]}
-                                        style={{ marginBottom: '0px' }}
-                                    >
-                                        <Input
-                                            size="large"
-                                            onChange={handleCpfChange}
-                                            placeholder="CPF"
-                                            variant="underlined"
-                                            maxLength={14}
-                                        />
-                                    </Form.Item>
-
-                                    <Form.Item<UsuarioDTO["estadoId"]>
-                                        name="estadoId"
-                                        rules={[{ required: true, message: 'Por Favor, informe seu estado de residência!' }]}
-                                        style={{ marginBottom: '0px' }}
-                                    >
-                                        <Select
-                                            showSearch
-                                            placeholder="Estado de Residência"
-                                            variant="underlined"
-                                            style={{ flex: 1 }}
-                                            filterSort={(optionA, optionB) =>
-                                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                                            }
-                                            optionFilterProp="label"
-                                            options={estados}
-                                        />
-                                    </Form.Item>
-                                </Flex>
-
-                                <Flex gap="middle" vertical style={{ gap: '16px' }}>
-                                    <Form.Item label={null} style={{ marginBottom: '0px' }}>
-                                        <BtnPrincipal
-                                            label='Próximo'
-                                            htmlType="submit"
-                                            size='middle'
-                                            disabled={loading}
-                                        />
-                                    </Form.Item>
-                                </Flex>
-                            </Col>
-                        </Row>
-                    )}
-
-                    {opcao == 3 && (
-                        <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
-                            <Col style={{ display: 'flex', flexDirection: 'column', gap: '26px' }} span={15}>
-                                <Flex gap="middle" vertical style={{ gap: '26px' }}>
-                                    <Form.Item<UsuarioDTO["email"]>
-                                        name="email"
-                                        rules={[
-                                            { required: true, message: 'Por favor, preencha seu email!' },
-                                            { type: 'email', message: 'Email inválido!' }
-                                        ]}
-                                        style={{ marginBottom: '0px' }}
-                                    >
-                                        <Input size="large" placeholder="Email@" variant="underlined" />
-                                    </Form.Item>
-
-                                    <Form.Item<UsuarioDTO["senha"]>
-                                        name="senha"
-                                        rules={[
-                                            { required: true, message: 'Por favor, preencha sua senha!' },
-                                            validatePasswordRule
-                                        ]}
-                                        style={{ marginBottom: '0px' }}
-                                    >
-                                        <Input.Password size="large" placeholder="Senha" variant="underlined" />
-                                    </Form.Item>
-                                </Flex>
-
-                                <Flex gap="middle" vertical style={{ gap: '16px' }}>
-                                    <Form.Item label={null} style={{ marginBottom: '0px' }}>
-                                        <BtnPrincipal
-                                            label='Cadastrar'
-                                            htmlType="submit"
-                                            size='middle'
-                                            disabled={loading}
-                                        />
-                                    </Form.Item>
-                                </Flex>
-                            </Col>
-                        </Row>
-                    )}
-                </Form>
+                        )}
+                    </Form>
+                </div>
 
                 <Modal
                     title="Recuperar Senha"
