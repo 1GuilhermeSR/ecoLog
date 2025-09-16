@@ -11,14 +11,17 @@
         img {
             width: 4vw;
             cursor: pointer;
+            @media (max-width: 768px) {
+                width: 14vw;
+            }
         }
     }
 
-    .containerPerfil{
+    .containerPerfil {
         padding: 0px 16px 0px 16px;
         border-left: 1px solid #f0f0f0;
 
-        button{
+        button {
             color: #888888;
         }
     }

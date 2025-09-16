@@ -147,10 +147,10 @@ describe('EmissaoCombustivel', () => {
         const dialog = await screen.findByRole('dialog');
 
         const dateInput = within(dialog).getByTestId('antd-date');
-        fireEvent.change(dateInput, { target: { value: '2024-03-10' } }); 
+        fireEvent.change(dateInput, { target: { value: '2024-03-10' } });
 
-        const spins = within(dialog).getAllByRole('spinbutton'); 
-        fireEvent.change(spins[1], { target: { value: '180' } }); 
+        const spins = within(dialog).getAllByRole('spinbutton');
+        fireEvent.change(spins[1], { target: { value: '180' } });
 
         // salva
         fireEvent.click(within(dialog).getByRole('button', { name: 'Salvar' }));
@@ -159,8 +159,8 @@ describe('EmissaoCombustivel', () => {
 
         const lastCall = emissaoService.editarEmissaoCombustivel.mock.calls.at(-1)?.[0];
         expect(lastCall).toMatchObject({
-            id: 3,              
-            kmPercorrido: 180,  
+            id: 3,
+            kmPercorrido: 180,
         });
         expect(lastCall?.data).toBe('05/03/2024');
 
@@ -177,6 +177,9 @@ describe('EmissaoCombustivel', () => {
         const deleteIcons = await screen.findAllByLabelText('delete');
 
         fireEvent.click(deleteIcons[1]);
+
+        const confirmBtn = await screen.findByRole('button', { name: 'Sim' });
+        fireEvent.click(confirmBtn);
 
         await waitFor(() =>
             expect(emissaoService.excluirEmissaoCombustivel).toHaveBeenCalledWith(2)
@@ -203,8 +206,8 @@ describe('EmissaoCombustivel', () => {
         fireEvent.change(dateInput, { target: { value: '2024-03-10' } });
 
         const spins = within(dialog).getAllByRole('spinbutton');
-        fireEvent.change(spins[0], { target: { value: '30' } }); 
-        fireEvent.change(spins[1], { target: { value: '999' } }); 
+        fireEvent.change(spins[0], { target: { value: '30' } });
+        fireEvent.change(spins[1], { target: { value: '999' } });
 
         fireEvent.click(within(dialog).getByRole('button', { name: 'Salvar' }));
         await waitFor(() => expect(emissaoService.editarEmissaoCombustivel).toHaveBeenCalled());
@@ -231,8 +234,8 @@ describe('EmissaoCombustivel', () => {
 
         // média e km
         const spins = within(dialog).getAllByRole('spinbutton');
-        fireEvent.change(spins[0], { target: { value: '10' } });  
-        fireEvent.change(spins[1], { target: { value: '100' } }); 
+        fireEvent.change(spins[0], { target: { value: '10' } });
+        fireEvent.change(spins[1], { target: { value: '100' } });
 
         const select = within(dialog).getByTestId('antd-select');
         fireEvent.change(select, { target: { value: '1' } });
@@ -297,9 +300,9 @@ describe('EmissaoCombustivel', () => {
 
         expect(norm(getCO2El().textContent || '')).toBe('0.00 Kg');
 
-        const spins = within(dialog).getAllByRole('spinbutton'); 
-        fireEvent.change(spins[0], { target: { value: '10' } });  
-        fireEvent.change(spins[1], { target: { value: '100' } });  
+        const spins = within(dialog).getAllByRole('spinbutton');
+        fireEvent.change(spins[0], { target: { value: '10' } });
+        fireEvent.change(spins[1], { target: { value: '100' } });
 
         const select = within(dialog).getByTestId('antd-select');
         fireEvent.change(select, { target: { value: '1' } });
@@ -338,7 +341,7 @@ describe('EmissaoCombustivel', () => {
         fireEvent.change(search, { target: { value: 'gasolina' } });
 
         await waitFor(() => {
-            expect(screen.queryByText('05/03/2024')).toBeNull(); 
+            expect(screen.queryByText('05/03/2024')).toBeNull();
             expect(screen.getByText('15/01/2024')).toBeInTheDocument();
             expect(screen.getByText('01/02/2024')).toBeInTheDocument();
         });
@@ -372,6 +375,9 @@ describe('EmissaoCombustivel', () => {
         const deleteIcons = await screen.findAllByLabelText('delete');
         fireEvent.click(deleteIcons[1]); // id:2
 
+        const confirmBtn = await screen.findByRole('button', { name: 'Sim' });
+        fireEvent.click(confirmBtn);
+
         await waitFor(() => expect(emissaoService.excluirEmissaoCombustivel).toHaveBeenCalledWith(2));
         await waitFor(() =>
             expect(messageOpenSpy).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }))
@@ -387,6 +393,9 @@ describe('EmissaoCombustivel', () => {
 
         const deleteIcons = await screen.findAllByLabelText('delete');
         fireEvent.click(deleteIcons[1]);
+
+        const confirmBtn = await screen.findByRole('button', { name: 'Sim' });
+        fireEvent.click(confirmBtn);
 
         await waitFor(() => expect(emissaoService.excluirEmissaoCombustivel).toHaveBeenCalledWith(2));
         await waitFor(() =>

@@ -1,4 +1,4 @@
-import { Col, Flex, message, Row, Space, Table, TableProps } from 'antd';
+import { Col, Flex, message, Popconfirm, Row, Space, Table, TableProps } from 'antd';
 import styles from './styles.module.scss';
 import { IoChevronBackSharp } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
@@ -14,9 +14,11 @@ import Loading from '../../components/geral/Loading';
 import emissaoCombustivelService from '../../services/emissao_combustivel/emissaoCombustivelService';
 import { removeById, sortInitialByDateDesc, upsertByIdMaintainDateDesc } from '../../utils/listOrder';
 import { EmissaoCombustivelUpsertDTO } from '../../dto/emissao_combustivel/emissaoCombustivelUpsertDTO';
-
+import { Grid } from 'antd';
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
 const BackIcon = IoChevronBackSharp as unknown as SVGIcon;
+
+const { useBreakpoint } = Grid;
 
 export default function EmissaoCombustivel() {
   const navigate = useNavigate();
@@ -28,6 +30,15 @@ export default function EmissaoCombustivel() {
   const [currentItem, setCurrentItem] = useState<EmissaoCombustivelDTO | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [messageApi, contextHolder] = message.useMessage();
+
+  const screens = useBreakpoint();
+  const pageSize = useMemo(() => {
+    if (screens.xs) return 9;  // Celulares comuns
+    return 7;
+  }, [screens]);
+  const [current, setCurrent] = useState(1);
+
+  useEffect(() => setCurrent(1), [termoBusca, pageSize]);
 
   const fetchEmissoes = useCallback(async () => {
     setLoading(true);
@@ -111,63 +122,72 @@ export default function EmissaoCombustivel() {
   };
 
   const handleSave = async (values: EmissaoCombustivelDTO) => {
-    const isEditing = !!currentItem?.id;
-    var sucesso = false;
+    try {
+      setLoading(true);
+      const isEditing = !!currentItem?.id;
+      var sucesso = false;
 
-    const upsert: EmissaoCombustivelUpsertDTO = {
-      id: isEditing ? currentItem!.id : 0,
-      data: values.data.format('DD/MM/YYYY'),
-      kmPercorrido: Number(values.kmPercorrido),
-      idCombustivel: Number(values.idCombustivel),
-      mediaKm: Number(values.mediaKm),
-      co2Emitido: Number(values.co2Emitido?.toFixed?.(4) ?? 0),
-      fatorEmissao: Number(values.fatorEmissao ?? 0),
-    };
-
-    if (isEditing) {
-      const response = await emissaoCombustivelService.editarEmissaoCombustivel(upsert);
-      if (response.success) {
-        messageApi.open({ type: 'success', content: 'Emissão editada com sucesso!' });
-        sucesso = true;
-      }
-      else {
-        messageApi.open({ type: 'error', content: 'Erro ao editar emissão!\n' + response.message });
-      }
-    }
-    else {
-      const response = await emissaoCombustivelService.gravarEmissaoCombustivel(upsert);
-      if (response.success) {
-        messageApi.open({ type: 'success', content: 'Emissão gravada com sucesso!' });
-        sucesso = true;
-      }
-      else {
-        messageApi.open({ type: 'error', content: 'Erro ao gravar emissão!\n' + response.message });
-      }
-    }
-
-    if (sucesso) {
-      const rowForTable: EmissaoCombustivelDTO = {
-        id: upsert.id ?? (emissoes.reduce((m, e) => (e.id ?? 0) > m ? (e.id ?? 0) : m, 0) + 1),
-        data: dayjs(upsert.data, 'DD/MM/YYYY'),
-        idCombustivel: upsert.idCombustivel,
-        nomeCombustivel: values.nomeCombustivel ?? currentItem?.nomeCombustivel ?? '',
-        mediaKm: upsert.mediaKm,
-        kmPercorrido: upsert.kmPercorrido,
-        co2Emitido: upsert.co2Emitido!,
-        fatorEmissao: upsert.fatorEmissao,
-        idEstado: currentItem?.idEstado,
-        idUsuario: currentItem?.idUsuario,
+      const upsert: EmissaoCombustivelUpsertDTO = {
+        id: isEditing ? currentItem!.id : 0,
+        data: values.data.format('DD/MM/YYYY'),
+        kmPercorrido: Number(values.kmPercorrido),
+        idCombustivel: Number(values.idCombustivel),
+        mediaKm: Number(values.mediaKm),
+        co2Emitido: Number(values.co2Emitido?.toFixed?.(4) ?? 0),
+        fatorEmissao: Number(values.fatorEmissao ?? 0),
       };
 
-      setEmissoes(prev => upsertByIdMaintainDateDesc(prev, rowForTable));
+      if (isEditing) {
+        const response = await emissaoCombustivelService.editarEmissaoCombustivel(upsert);
+        if (response.success) {
+          messageApi.open({ type: 'success', content: 'Emissão editada com sucesso!' });
+          sucesso = true;
+        }
+        else {
+          messageApi.open({ type: 'error', content: 'Erro ao editar emissão!\n' + response.message });
+        }
+      }
+      else {
+        const response = await emissaoCombustivelService.gravarEmissaoCombustivel(upsert);
+        if (response.success) {
+          messageApi.open({ type: 'success', content: 'Emissão gravada com sucesso!' });
+          sucesso = true;
+        }
+        else {
+          messageApi.open({ type: 'error', content: 'Erro ao gravar emissão!\n' + response.message });
+        }
+      }
 
+      if (sucesso) {
+        const rowForTable: EmissaoCombustivelDTO = {
+          id: upsert.id ?? (emissoes.reduce((m, e) => (e.id ?? 0) > m ? (e.id ?? 0) : m, 0) + 1),
+          data: dayjs(upsert.data, 'DD/MM/YYYY'),
+          idCombustivel: upsert.idCombustivel,
+          nomeCombustivel: values.nomeCombustivel ?? currentItem?.nomeCombustivel ?? '',
+          mediaKm: upsert.mediaKm,
+          kmPercorrido: upsert.kmPercorrido,
+          co2Emitido: upsert.co2Emitido!,
+          fatorEmissao: upsert.fatorEmissao,
+          idEstado: currentItem?.idEstado,
+          idUsuario: currentItem?.idUsuario,
+        };
+
+        setEmissoes(prev => upsertByIdMaintainDateDesc(prev, rowForTable));
+
+
+        setIsModalOpen(false);
+        setCurrentItem(null);
+      }
 
       setIsModalOpen(false);
       setCurrentItem(null);
+    } catch (error) {
+      messageApi.open({ type: 'error', content: 'Erro ao salvar emissão!\n' + error });
+    }
+    finally {
+      setLoading(false);
     }
 
-    setIsModalOpen(false);
-    setCurrentItem(null);
   };
 
   const columns: TableProps<EmissaoCombustivelDTO>['columns'] = [
@@ -210,10 +230,19 @@ export default function EmissaoCombustivel() {
       title: <span className={styles.headerTable}>Ações</span>,
       key: 'action',
       align: 'center',
-      render: (_, r) => (
+      fixed: 'right',
+      render: (_, record) => (
         <Space size="middle">
-          <EditOutlined className={styles.editIcon} onClick={() => editar(r)} />
-          <DeleteOutlined className={styles.deleteIcon} onClick={() => excluir(r)} />
+          <EditOutlined className={styles.editIcon} onClick={() => editar(record)} />
+          <Popconfirm
+            title="Excluir emissão"
+            description="Tem certeza que deseja excluir esta emissão?"
+            okText="Sim"
+            cancelText="Não"
+            onConfirm={() => excluir(record)}
+          >
+            <DeleteOutlined className={styles.deleteIcon} />
+          </Popconfirm>
         </Space>
       ),
     },
@@ -253,11 +282,14 @@ export default function EmissaoCombustivel() {
         <Row style={{ marginTop: 26 }}>
           <Col span={24}>
             <Table<EmissaoCombustivelDTO>
+              className={styles.table}
               columns={columns}
               dataSource={emissoesFiltradas}
               size="middle"
               pagination={{
-                pageSize: 6,
+                current,
+                onChange: (p) => setCurrent(p),
+                pageSize,
                 showSizeChanger: false,
                 showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} registros`,
               }}

@@ -163,14 +163,20 @@ export default function ModalEmissaoCombustivel({
                   <Form.Item<EmissaoCombustivelDTO['mediaKm']>
                     layout="vertical"
                     name="mediaKm"
-                    rules={[{ required: true, message: 'Por favor, informe a média de KM/L corretamente!' }]}
+                    rules={[{ required: true, message: 'Por favor, informe a média de KM/L corretamente!' },
+                    {
+                      validator: (_, value) =>
+                        value != null && Number(value) > 0
+                          ? Promise.resolve()
+                          : Promise.reject(new Error('Média de KM/L deve ser maior que 0.')),
+                    },]}
                   >
                     <InputNumber
                       controls={false}
                       placeholder=""
                       variant="underlined"
                       style={{ width: '100%' }}
-                      min={0}
+                      min={1}
                       step={0.1}
                     />
                   </Form.Item>
@@ -185,14 +191,20 @@ export default function ModalEmissaoCombustivel({
                   <Form.Item<EmissaoCombustivelDTO['kmPercorrido']>
                     layout="vertical"
                     name="kmPercorrido"
-                    rules={[{ required: true, message: 'Por favor, informe o KM percorrido corretamente!' }]}
+                    rules={[{ required: true, message: 'Por favor, informe o KM percorrido corretamente!' },
+                    {
+                      validator: (_, value) =>
+                        value != null && Number(value) > 0
+                          ? Promise.resolve()
+                          : Promise.reject(new Error('KM Percorrido deve ser maior que 0.')),
+                    }]}
                   >
                     <InputNumber
                       controls={false}
                       placeholder=""
                       variant="underlined"
                       style={{ width: '100%' }}
-                      min={0}
+                      min={1}
                       step={0.1}
                     />
                   </Form.Item>
@@ -219,7 +231,7 @@ export default function ModalEmissaoCombustivel({
                         (a?.label ?? '').toLowerCase().localeCompare((b?.label ?? '').toLowerCase())
                       }
                       options={combustiveis.map((combustivel) => ({
-                        value: combustivel.id, 
+                        value: combustivel.id,
                         label: combustivel.nome,
                       }))}
                     />

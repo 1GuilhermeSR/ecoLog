@@ -12,13 +12,18 @@
         display: flex;
         max-height: 100%;
         align-items: center;
-        position: relative; 
+        position: relative;
 
         svg {
             position: absolute;
             left: -6rem;
             color: #8d8d8d4b;
             font-size: 5em;
+
+            @media (max-width: 768px) {
+                font-size: 3em;
+                left: -3.5rem;
+            }
         }
 
         .box {
@@ -34,6 +39,16 @@
             .valor {
                 font-size: 1.3em;
                 color: #5D5D5D;
+            }
+
+            @media (max-width: 768px) {
+                .titulo {
+                    font-size: 0.9em;
+                }
+
+                .valor {
+                    font-size: 1.1em;
+                }
             }
         }
     }
