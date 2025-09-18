@@ -1,4 +1,3 @@
-// src/layout/AppLayout.tsx
 import { Button, Dropdown, Layout, Menu, MenuProps, message } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 import styles from './styles.module.scss';
@@ -49,7 +48,7 @@ export default function AppLayout() {
   );
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh' }}>      
       <Header style={{ display: 'flex', backgroundColor: 'white', padding: '0px', height: '8vh' }}>
         <div className={styles.header}>
           <div className={styles.containerLogo}>
@@ -71,7 +70,13 @@ export default function AppLayout() {
         </div>
       </Header>
 
-      <Content className={styles.main}>
+      <Content
+        style={{
+          backgroundImage: "url(/bgMenu.avif)",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "bottom",
+          backgroundSize: "cover",
+        }} className={styles.main}>
         <Outlet />
       </Content>
     </Layout>

@@ -175,11 +175,15 @@ export default function Login() {
 
 
     return (
-        <div className={styles.main}>
+        <div className={styles.main} style={{
+            backgroundImage: "url(/bgLogin.avif)",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+        }}>
             <div className={styles.container}>
                 {contextHolder}
                 {loading && (<Loading />)}
-                
                 <div className={styles.header}>
                     {opcao > 1 && <BackIcon onClick={voltar} className={styles.backIcon} />}
                     <img src="/ecoLog_logo.png" alt="ecoLog" className={styles.logo} />
