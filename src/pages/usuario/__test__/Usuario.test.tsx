@@ -1,4 +1,4 @@
-import { screen, waitFor, fireEvent } from '@testing-library/react';
+import { screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { renderWithRouter } from '../../../tests/utils/test-utils';
 import '../../../tests/mocks/router';
 import '../../../tests/mocks/antd-lite';
@@ -87,7 +87,7 @@ describe('Usuario', () => {
         expect(screen.getByPlaceholderText('CPF')).toHaveValue('123.456.789-01');
 
         const select = screen.getByTestId('antd-select');
-        fireEvent.click(select); 
+        fireEvent.click(select);
         expect(await screen.findByRole('option', { name: 'São Paulo' })).toBeInTheDocument();
         expect(await screen.findByRole('option', { name: 'Paraná' })).toBeInTheDocument();
     });
@@ -110,7 +110,6 @@ describe('Usuario', () => {
             estadoId: 2,
             estadoNome: 'Paraná',
         });
-
     });
 
     it('salvar com erro mostra mensagem de erro (mantém chamada do serviço)', async () => {
@@ -131,7 +130,7 @@ describe('Usuario', () => {
     });
 
     it('excluir conta: confirma e navega para /login (success)', async () => {
-        confirmResult = true; 
+        confirmResult = true;
 
         renderWithRouter(<Usuario />, { route: '/usuario' });
 
@@ -219,21 +218,18 @@ describe('Usuario', () => {
 
     it('excluirConta: exceção no service cai no catch e mostra erro (sem navegar)', async () => {
         userService.excluirConta.mockRejectedValueOnce(new Error('boom'));
-
-        const { message, Modal } = require('antd');
+        confirmResult = true;
+        const { message } = require('antd');
         const openSpy = jest.fn();
         const useMessageSpy = jest
             .spyOn(message, 'useMessage')
             .mockReturnValue([{ open: openSpy } as any, <div key="ctx" />] as any);
 
-        const localConfirm = jest.fn(async () => true);
-        (Modal as any).useModal.mockReturnValueOnce([{ confirm: localConfirm }, <div key="ctx" />]);
-
         renderWithRouter(<Usuario />, { route: '/usuario' });
 
         fireEvent.click(screen.getByRole('button', { name: 'Excluir a conta' }));
 
-        await waitFor(() => expect(localConfirm).toHaveBeenCalled());
+        await waitFor(() => expect(confirmSpy).toHaveBeenCalled());
         await waitFor(() => expect(userService.excluirConta).toHaveBeenCalled());
 
         await waitFor(() =>
@@ -248,6 +244,13 @@ describe('Usuario', () => {
         userService.getCurrentUser.mockReturnValue(null);
         estadoService.getAllEstado.mockResolvedValueOnce(ESTADOS);
 
+        // garante a tupla do message.useMessage
+        const { message } = require('antd');
+        const openSpy = jest.fn();
+        const useMessageSpy = jest
+            .spyOn(message, 'useMessage')
+            .mockReturnValue([{ open: openSpy } as any, <div key="ctx" />] as any);
+
         renderWithRouter(<Usuario />, { route: '/usuario' });
 
         await waitFor(() => expect(estadoService.getAllEstado).toHaveBeenCalled());
@@ -256,6 +259,7 @@ describe('Usuario', () => {
         expect(screen.getByPlaceholderText('Nome Completo')).toHaveValue('');
         expect(screen.getByTestId('antd-date')).toHaveValue('');
         expect(screen.getByPlaceholderText('CPF')).toHaveValue('');
-    });
 
+        useMessageSpy.mockRestore();
+    });
 });
