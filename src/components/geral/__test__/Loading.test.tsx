@@ -61,7 +61,7 @@ describe('Loading Component', () => {
             top: '0px',
             left: '0px',
             width: '100%',
-            height: '100vh',
+            height: '100%',
             zIndex: '9999',
             display: 'flex',
             justifyContent: 'center',
@@ -111,7 +111,7 @@ describe('Loading Component', () => {
             top: '0px',
             left: '0px',
             width: '100%',
-            height: '100vh',
+            height: '100%',
             zIndex: '9999'
         });
     });

@@ -261,7 +261,6 @@ export default function EmissaoCombustivel() {
       </Row>
 
       <div className={styles.container}>
-        {loading && (<Loading />)}
         {contextHolder}
         <Row>
           <Col span={24}>
@@ -281,6 +280,7 @@ export default function EmissaoCombustivel() {
 
         <Row style={{ marginTop: 26 }}>
           <Col span={24}>
+            {loading && (<Loading />)}
             <Table<EmissaoCombustivelDTO>
               className={styles.table}
               columns={columns}

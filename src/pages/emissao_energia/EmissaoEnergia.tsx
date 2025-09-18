@@ -283,7 +283,6 @@ export default function EmissaoEnergia() {
             </Row>
 
             <div className={styles.container}>
-                {loading && (<Loading />)}
                 {contextHolder}
                 <Row>
                     <Col span={24}>
@@ -303,6 +302,7 @@ export default function EmissaoEnergia() {
 
                 <Row style={{ marginTop: '26px' }}>
                     <Col span={24}>
+                        {loading && (<Loading />)}
                         <Table<EmissaoEnergiaDTO>
                             rowKey="id"
                             columns={columns}

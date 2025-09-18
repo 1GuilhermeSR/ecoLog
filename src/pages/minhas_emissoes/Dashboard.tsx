@@ -233,7 +233,6 @@ export default function Dashboard() {
 
     return (
         <div className={styles.main}>
-            {loading && (<Loading />)}
             {contextHolder}
             <div className={styles.container}>
                 <div className={styles.header}>
@@ -243,6 +242,7 @@ export default function Dashboard() {
 
                 <div className={styles.body}>
                     <Row gutter={[16, 16]} style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                        {loading && (<Loading />)}
                         <Col xs={24} lg={9} style={{ height: isXs ? '80%' : '100%' }}>
                             <div className={styles.card}>
                                 <div className={styles.containerFiltros}>
@@ -314,7 +314,7 @@ export default function Dashboard() {
                                     </Row>
                                 </div>
 
-                                <div className={styles.containerGrafico} style={{ height: '100%'}}>
+                                <div className={styles.containerGrafico} style={{ height: '100%' }}>
                                     <Line options={lineOptions} data={lineData} />
                                 </div>
                             </div>
