@@ -1,7 +1,7 @@
 .main {
   height: 100vh;
   display: flex;
-  background: url('../../../public/bgLogin.jpg') no-repeat center/cover;
+  //background: url('../../../public/bgLogin.avif') no-repeat center/cover;
 
   @media (max-width: 768px) {
     height: 100dvh;
@@ -32,6 +32,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px 16px;
+  margin-bottom: 88px;
 
   @media (max-width: 768px) {
     position: absolute;

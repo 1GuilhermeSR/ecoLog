@@ -10,12 +10,16 @@ import userService from '../../services/usuario/usuarioService';
 import dayjs from 'dayjs';
 import estadoService from '../../services/estado/estadoService';
 import Loading from '../../components/geral/Loading';
+import { Grid } from 'antd';
 
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
 const BackIcon = IoChevronBackSharp as unknown as SVGIcon;
 
 const ReachableContext = createContext<string | null>(null);
 const UnreachableContext = createContext<string | null>(null);
+
+const { useBreakpoint } = Grid;
+
 const config = {
     title: 'Deletar usuario?',
     content: (
@@ -35,7 +39,8 @@ export default function Usuario() {
     const [messageApi, contextHolder] = message.useMessage();
     const [modal, contextHolderModal] = Modal.useModal();
     const [loading, setLoading] = useState(false);
-
+    const screens = useBreakpoint();
+    const isXs = !screens.sm;
 
     const initialValues = useMemo(() => {
         if (!dados) return {};
@@ -99,7 +104,7 @@ export default function Usuario() {
     async function excluirConta() {
         try {
             setLoading(true);
-            const response = await userService.excluirConta();            
+            const response = await userService.excluirConta();
             if (response.success) {
                 messageApi.open({ type: 'success', content: 'Conta excluída com sucesso!' });
                 navigate('/login', { replace: true });
@@ -138,7 +143,7 @@ export default function Usuario() {
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center', gap: '3rem' }}>
                         <Row justify="center">
-                            <Col span={15}>
+                            <Col span={ isXs ? 18 : 15 }>
                                 <Form.Item<UsuarioDTO["email"]>
                                     name="email"
                                     rules={[{ required: false, message: 'Por favor, preencha seu email corretamente!', type: 'email' }]}
@@ -150,7 +155,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={15}>
+                            <Col span={ isXs ? 18 : 15 }>
                                 <Form.Item<UsuarioDTO["nome"]>
                                     name="nome"
                                     rules={[{ required: true, message: 'Por Favor, preencha o seu nome!' }]}
@@ -162,7 +167,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={15}>
+                            <Col span={ isXs ? 18 : 15 }>
                                 <Form.Item<UsuarioDTO["dataNascimento"]>
                                     name="dataNascimento"
                                     rules={[{ required: true, message: 'Por Favor, preencha sua data de nascimento!' }]}
@@ -174,7 +179,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={15}>
+                            <Col span={ isXs ? 18 : 15 }>
                                 <Form.Item<UsuarioDTO["cpf"]>
                                     name="cpf"
                                     rules={[{ required: true, message: 'Por Favor, preencha seu CPF!', len: 14 }]}
@@ -186,7 +191,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={15}>
+                            <Col span={ isXs ? 18 : 15 }>
                                 <Form.Item<UsuarioDTO["estadoId"]>
                                     name="estadoId"
                                     rules={[{ required: true, message: 'Por Favor, informe seu estado de residencia!' }]}
@@ -208,7 +213,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={15}>
+                            <Col span={ isXs ? 18 : 15 }>
                                 <Flex gap="middle" vertical={false} style={{ gap: '16px' }}>
                                     <BtnSecundario onClick={async () => {
                                         const confirmed = await modal.confirm(config);
