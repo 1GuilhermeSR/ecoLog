@@ -1,13 +1,13 @@
-import { Carousel, Col, Modal, Row, Spin, Tooltip } from "antd";
+import { Carousel, Col, Modal, Row, Spin, Tooltip, Grid } from 'antd';
+import { GiBrazil } from 'react-icons/gi';
+import { SlGraph } from 'react-icons/sl';
+import { BsFuelPump, BsQuestionCircle } from 'react-icons/bs';
+import { TbPlusMinus } from 'react-icons/tb';
+import { ResumoDTO } from '../../dto/minhas_emissoes/ResumoDTO';
 import styles from './styles.module.scss';
-import { GiBrazil } from "react-icons/gi";
-import { SlGraph } from "react-icons/sl";
-import { BsFuelPump } from "react-icons/bs";
-import { TbPlusMinus } from "react-icons/tb";
-import { BsQuestionCircle } from "react-icons/bs";
-import { ResumoDTO } from "../../dto/minhas_emissoes/ResumoDTO";
-import { LoadingOutlined } from "@ant-design/icons";
-import { Grid } from 'antd';
+
+const { useBreakpoint } = Grid;
+
 type SVGIcon = React.FC<React.SVGProps<SVGSVGElement>>;
 const IconBrasil = GiBrazil as unknown as SVGIcon;
 const IconGraph = SlGraph as unknown as SVGIcon;
@@ -15,7 +15,6 @@ const IconCombustivel = BsFuelPump as unknown as SVGIcon;
 const IconMedia = TbPlusMinus as unknown as SVGIcon;
 const IconInterrogacao = BsQuestionCircle as unknown as SVGIcon;
 
-const { useBreakpoint } = Grid;
 interface ResumoDashboardProps {
     isOpen: boolean;
     resumoDTO: ResumoDTO;
@@ -23,33 +22,29 @@ interface ResumoDashboardProps {
     onClose: () => void;
 }
 
-export default function Resumo({
-    isOpen,
-    resumoDTO,
-    loadingModal,
-    onClose
-}: ResumoDashboardProps) {
+export default function Resumo({ isOpen, resumoDTO, loadingModal, onClose }: ResumoDashboardProps) {
     const screens = useBreakpoint();
     const isXs = !screens.sm;
 
     return (
-
         <Modal
             title={
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderBottom: '1px solid #8d8d8d6c',
-                    color: '#8D8D8D',
-                    paddingBottom: '8px',
-                    marginBottom: '16px',
-                    gap: '4px',
-                    fontSize: '1.1em'
-                }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderBottom: '1px solid #8d8d8d6c',
+                        color: '#8D8D8D',
+                        paddingBottom: '8px',
+                        marginBottom: '16px',
+                        gap: '4px',
+                        fontSize: '1.1em',
+                    }}
+                >
                     <span>Resumo </span>
-                    <Tooltip title="Todos os calculos são feitos com base nos útimos três meses" color={'#175E73'} key={'#175E73'}>
-                        <IconInterrogacao style={{ color: '#8d8d8d85' }} />
+                    <Tooltip title="Todos os calculos são feitos com base nos útimos três meses" color={'#175E73'}>
+                        <IconInterrogacao style={{ color: '#8d8d8d71' }} />
                     </Tooltip>
                 </div>
             }
@@ -58,23 +53,25 @@ export default function Resumo({
             open={isOpen}
             onCancel={onClose}
             footer={[]}
-            width={isXs ? '90vw' : '40vw'}
+            width={isXs ? '90vw' : '36vw'}
         >
-            {loadingModal ?
-                (<div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '100%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.49)'
-                }}>
-                    <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-                </div>)
-                :
+            {loadingModal ? (
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '100%',
+                        backgroundColor: 'rgba(255, 255, 255, 0.49)',
+                    }}
+                >
+                    <Spin />
+                </div>
+            ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <Row>
                         <Col span={24}>
-                            <Carousel autoplay={{ dotDuration: true }} autoplaySpeed={5000} arrows infinite={true}>
+                            <Carousel autoplay={{ dotDuration: true }} autoplaySpeed={5000} arrows infinite>
                                 <div>
                                     <div className={styles.cardCarousel}>
                                         <div className={styles.container}>
@@ -114,7 +111,12 @@ export default function Resumo({
                                             <IconGraph />
                                             <div className={styles.box}>
                                                 <span className={styles.titulo}>Seu percentual de redução</span>
-                                                <span style={{ color: resumoDTO?.percentualReducao < 0 ? '#BF4A4A' : '#5FC26E' }} className={styles.valor}>{resumoDTO?.percentualReducao.toFixed(2)}%</span>
+                                                <span
+                                                    style={{ color: resumoDTO?.percentualReducao < 0 ? '#BF4A4A' : '#5FC26E' }}
+                                                    className={styles.valor}
+                                                >
+                                                    {resumoDTO?.percentualReducao.toFixed(2)}%
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -126,18 +128,16 @@ export default function Resumo({
                     <Row>
                         <Col span={24} style={{ color: '#5D5D5D' }}>
                             Mensagem:
+                            <Tooltip title="Esta mensagem é gerada por inteligência artificial e pode conter imprecisões. Nenhuma informação pessoal sua é compartilhada com a IA." color={'#175E73'}>
+                                <IconInterrogacao style={{ color: '#8d8d8d71', marginLeft: '4px' }} />
+                            </Tooltip>
                             <div className={styles.cardMensagem}>
-                                <span>
-                                    {resumoDTO?.msgGemini}
-                                </span>
+                                <span>{resumoDTO?.msgGemini}</span>
                             </div>
                         </Col>
                     </Row>
-
                 </div>
-            }
-
+            )}
         </Modal>
-
-    )
+    );
 }

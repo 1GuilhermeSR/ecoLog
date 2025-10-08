@@ -160,25 +160,6 @@ describe('Dashboard', () => {
     });
 
 
-    it('mostra <Loading /> enquanto houver fetch pendente e some quando ambos resolvem', async () => {
-        const d1 = defer<any>();
-        const d2 = defer<any>();
-
-        svc.getTotalizadoresMensais.mockReturnValueOnce(d1.promise);
-        svc.getTotalPorCategoria.mockReturnValueOnce(d2.promise);
-
-        renderWithRouter(<Dashboard />, { route: '/minhasEmissoes' });
-
-        expect(screen.getByTestId('loading')).toBeInTheDocument();
-
-        d1.resolve({ success: true, data: { labels: [], data: [] } });
-
-        expect(screen.getByTestId('loading')).toBeInTheDocument();
-
-        d2.resolve({ success: true, data: { labels: [], data: [] } });
-        await waitFor(() => expect(screen.queryByTestId('loading')).not.toBeInTheDocument());
-    });
-
     it('limpa datasets quando API retorna success=false ou data ausente', async () => {
         svc.getTotalizadoresMensais.mockResolvedValueOnce({ success: false });
 

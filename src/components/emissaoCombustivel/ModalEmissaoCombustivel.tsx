@@ -1,12 +1,12 @@
-import { Col, DatePicker, Flex, Form, FormProps, InputNumber, Modal, Row, Select } from 'antd';
-import { EmissaoCombustivelDTO } from '../../dto/emissao_combustivel/EmissaoCombustivelDTO';
-import { CombustivelDTO } from '../../dto/combustivel/CombustivelDTO';
+import { useCallback, useEffect, useState } from 'react';
+import { Col, DatePicker, Flex, Form, type FormProps, InputNumber, Modal, Row, Select } from 'antd';
 import BtnPrincipal from '../geral/BtnPrincipal';
 import BtnSecundario from '../geral/BtnSecundario';
-import styles from './styles.module.scss';
-import { useCallback, useEffect, useState } from 'react';
 import Loading from '../geral/Loading';
+import { EmissaoCombustivelDTO } from '../../dto/emissao_combustivel/EmissaoCombustivelDTO';
+import { CombustivelDTO } from '../../dto/combustivel/CombustivelDTO';
 import combustivelService from '../../services/combustivel/combustivelService';
+import styles from './styles.module.scss';
 
 interface ModalEmissaoCombustivelProps {
   isOpen: boolean;
@@ -15,12 +15,7 @@ interface ModalEmissaoCombustivelProps {
   editingItem?: EmissaoCombustivelDTO | null;
 }
 
-export default function ModalEmissaoCombustivel({
-  isOpen,
-  onClose,
-  onSave,
-  editingItem,
-}: ModalEmissaoCombustivelProps) {
+export default function ModalEmissaoCombustivel({ isOpen, onClose, onSave, editingItem }: ModalEmissaoCombustivelProps) {
   const [form] = Form.useForm<EmissaoCombustivelDTO>();
   const [co2Calculado, setCo2Calculado] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -47,13 +42,11 @@ export default function ModalEmissaoCombustivel({
     if (!isOpen) return;
 
     if (editingItem) {
-      // garante que o Select bate o tipo number
       form.setFieldsValue({
         ...editingItem,
         idCombustivel: editingItem.idCombustivel,
       });
 
-      // recalc com fator do combustível carregado
       const c = combustiveis.find((x) => x.id === editingItem.idCombustivel);
       if (c && editingItem.mediaKm && editingItem.kmPercorrido) {
         const litros = Number(editingItem.kmPercorrido) / Number(editingItem.mediaKm);
@@ -67,7 +60,6 @@ export default function ModalEmissaoCombustivel({
     }
   }, [isOpen, editingItem, combustiveis, form]);
 
-  // Recalcula CO2 a cada mudança de campos
   const handleValuesChange = (_: any, all: EmissaoCombustivelDTO) => {
     const mediaKm = Number(all.mediaKm);
     const kmPercorrido = Number(all.kmPercorrido);
@@ -163,13 +155,15 @@ export default function ModalEmissaoCombustivel({
                   <Form.Item<EmissaoCombustivelDTO['mediaKm']>
                     layout="vertical"
                     name="mediaKm"
-                    rules={[{ required: true, message: 'Por favor, informe a média de KM/L corretamente!' },
-                    {
-                      validator: (_, value) =>
-                        value != null && Number(value) > 0
-                          ? Promise.resolve()
-                          : Promise.reject(new Error('Média de KM/L deve ser maior que 0.')),
-                    },]}
+                    rules={[
+                      { required: true, message: 'Por favor, informe a média de KM/L corretamente!' },
+                      {
+                        validator: (_, value) =>
+                          value != null && Number(value) > 0
+                            ? Promise.resolve()
+                            : Promise.reject(new Error('Média de KM/L deve ser maior que 0.')),
+                      },
+                    ]}
                   >
                     <InputNumber
                       controls={false}
@@ -191,13 +185,15 @@ export default function ModalEmissaoCombustivel({
                   <Form.Item<EmissaoCombustivelDTO['kmPercorrido']>
                     layout="vertical"
                     name="kmPercorrido"
-                    rules={[{ required: true, message: 'Por favor, informe o KM percorrido corretamente!' },
-                    {
-                      validator: (_, value) =>
-                        value != null && Number(value) > 0
-                          ? Promise.resolve()
-                          : Promise.reject(new Error('KM Percorrido deve ser maior que 0.')),
-                    }]}
+                    rules={[
+                      { required: true, message: 'Por favor, informe o KM percorrido corretamente!' },
+                      {
+                        validator: (_, value) =>
+                          value != null && Number(value) > 0
+                            ? Promise.resolve()
+                            : Promise.reject(new Error('KM Percorrido deve ser maior que 0.')),
+                      },
+                    ]}
                   >
                     <InputNumber
                       controls={false}
@@ -227,13 +223,8 @@ export default function ModalEmissaoCombustivel({
                       style={{ flex: 1 }}
                       className={styles.dropdownCombustivel}
                       optionFilterProp="label"
-                      filterSort={(a, b) =>
-                        (a?.label ?? '').toLowerCase().localeCompare((b?.label ?? '').toLowerCase())
-                      }
-                      options={combustiveis.map((combustivel) => ({
-                        value: combustivel.id,
-                        label: combustivel.nome,
-                      }))}
+                      filterSort={(a, b) => (a?.label ?? '').toLowerCase().localeCompare((b?.label ?? '').toLowerCase())}
+                      options={combustiveis.map((combustivel) => ({ value: combustivel.id, label: combustivel.nome }))}
                     />
                   </Form.Item>
                 </Flex>

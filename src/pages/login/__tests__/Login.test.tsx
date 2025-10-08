@@ -54,7 +54,7 @@ describe('Login page', () => {
 
         fireEvent.change(screen.getByPlaceholderText('Nome Completo'), { target: { value: 'Fulano de Tal' } });
         fireEvent.change(screen.getByLabelText('Data de Nascimento'), { target: { value: '2020-01-01' } }); 
-        fireEvent.change(screen.getByPlaceholderText('CPF'), { target: { value: '123.456.789-01' } });
+        fireEvent.change(screen.getByPlaceholderText('CPF'), { target: { value: '870.344.640-90' } });
 
         const select = screen.getByTestId('antd-select');
         fireEvent.change(select, { target: { value: '1' } });
@@ -70,7 +70,7 @@ describe('Login page', () => {
         await waitFor(() => {
             expect(mockUserService.register).toHaveBeenCalledWith({
                 nome: 'Fulano de Tal',
-                cpf: '12345678901',
+                cpf: '87034464090',
                 email: 'user@eco.com',
                 senha: 'Abc@12345',
                 dataNascimento: '01/01/2020',
@@ -133,7 +133,7 @@ describe('Login page', () => {
 
         fireEvent.change(screen.getByPlaceholderText('Nome Completo'), { target: { value: 'Fulano de Tal' } });
         fireEvent.change(screen.getByLabelText('Data de Nascimento'), { target: { value: '2020-01-01' } });
-        fireEvent.change(screen.getByPlaceholderText('CPF'), { target: { value: '123.456.789-01' } });
+        fireEvent.change(screen.getByPlaceholderText('CPF'), { target: { value: '870.344.640-90' } });
         fireEvent.change(screen.getByTestId('antd-select'), { target: { value: '1' } });
 
         fireEvent.click(screen.getByRole('button', { name: 'Próximo' }));
@@ -182,7 +182,7 @@ describe('Login page', () => {
 
         fireEvent.change(screen.getByPlaceholderText('Nome Completo'), { target: { value: 'Fulano' } });
         fireEvent.change(screen.getByLabelText('Data de Nascimento'), { target: { value: '2020-02-02' } });
-        fireEvent.change(screen.getByPlaceholderText('CPF'), { target: { value: '123.456.789-01' } });
+        fireEvent.change(screen.getByPlaceholderText('CPF'), { target: { value: '870.344.640-90' } });
         fireEvent.change(screen.getByTestId('antd-select'), { target: { value: '1' } });
 
         fireEvent.click(screen.getByRole('button', { name: 'Próximo' }));
@@ -258,8 +258,8 @@ describe('Login page', () => {
         await waitFor(() => expect(mockEstadoService.getAllEstado).toHaveBeenCalled());
 
         const cpfInput = screen.getByPlaceholderText('CPF');
-        fireEvent.change(cpfInput, { target: { value: '12345678901' } });
-        expect(cpfInput).toHaveValue('123.456.789-01'); 
+        fireEvent.change(cpfInput, { target: { value: '87034464090' } });
+        expect(cpfInput).toHaveValue('870.344.640-90'); 
     });
 
     it('useEffect: falha ao carregar estados dispara toast de erro', async () => {

@@ -10,7 +10,7 @@ import Loading from '../../components/geral/Loading';
 import { useAuth } from '../../context/AuthContext';
 import estadoService from '../../services/estado/estadoService';
 import userService from '../../services/usuario/usuarioService';
-import { formatCpf, passwordValidationMessage } from '../../utils/stringUtils';
+import { formatCpf, passwordValidationMessage, isValidCpf } from '../../utils/stringUtils';
 import type { UsuarioDTO } from '../../dto/usuario/UsuarioDTO';
 import styles from './styles.module.scss';
 
@@ -21,20 +21,30 @@ const BackIcon = IoChevronBackSharp as unknown as SVGIcon;
 
 export default function Login() {
     const navigate = useNavigate();
+    const { syncAuth } = useAuth();
     const [opcao, setOpcao] = useState<number>(1);
-    const [formUsuario] = Form.useForm();
-    const [formRedefinirSenha] = Form.useForm();
     const [dadosUsuario, setDadosUsuario] = useState<Partial<UsuarioDTO>>({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [messageApi, contextHolder] = message.useMessage();
     const [estados, setEstados] = useState<any[]>([]);
-    const { syncAuth } = useAuth();
+    const [formUsuario] = Form.useForm();
+    const [formRedefinirSenha] = Form.useForm();
+    const [messageApi, contextHolder] = message.useMessage();
 
+    // ===== Handlers / Helpers =====
     const handleCpfChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-        const formatted = formatCpf(e.target.value)
-        formUsuario.setFieldsValue({ cpf: formatted })
-    }
+        const formatted = formatCpf(e.target.value);
+        formUsuario.setFieldsValue({ cpf: formatted });
+    };
+
+    const validateCpfRule: Rule = {
+        validator: async (_rule, value) => {
+            if (!value) return Promise.resolve(); // 'required' cuida do vazio
+            return isValidCpf(value)
+                ? Promise.resolve()
+                : Promise.reject(new Error('CPF inválido!'));
+        },
+    };
 
     const validatePasswordRule: Rule = {
         validator: async (_rule, value) => {
@@ -44,6 +54,36 @@ export default function Login() {
         },
     };
 
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
+        formRedefinirSenha.resetFields();
+    };
+
+    function proximo() {
+        if (opcao == 1) {
+            formUsuario.resetFields();
+        }
+        const valores = formUsuario.getFieldsValue();
+        setDadosUsuario((prev) => ({ ...prev, ...valores }));
+        setOpcao(opcao + 1);
+    }
+
+    function voltar() {
+        if (opcao == 2) {
+            formUsuario.resetFields();
+        }
+        setOpcao(opcao - 1);
+    }
+
+    const onFinishFailedLogin: FormProps<UsuarioDTO>['onFinishFailed'] = (errorInfo) => {
+        messageApi.open({ type: 'error', content: 'Ocorreu um erro ao fazer  login\n' + errorInfo });
+    };
+
+    // ===== Async Actions (API) =====
     async function login() {
         try {
             setLoading(true);
@@ -51,18 +91,18 @@ export default function Login() {
 
             const response = await userService.login({
                 email: values.email,
-                senha: values.senha
+                senha: values.senha,
             });
 
             if (response.success) {
-                messageApi.open({ type: 'success', content: 'Login realizado com sucesso!' })
+                messageApi.open({ type: 'success', content: 'Login realizado com sucesso!' });
                 await syncAuth();
                 navigate('/home');
             } else {
-                messageApi.open({ type: 'warning', content: response.message || 'Email ou senha inválidos' })
+                messageApi.open({ type: 'warning', content: response.message || 'Email ou senha inválidos' });
             }
         } catch (error: any) {
-            messageApi.open({ type: 'error', content: error.message || 'Erro ao realizar login' })
+            messageApi.open({ type: 'error', content: error.message || 'Erro ao realizar login' });
         } finally {
             setLoading(false);
         }
@@ -85,18 +125,18 @@ export default function Login() {
                 email: dadosCompletos.email,
                 senha: dadosCompletos.senha,
                 dataNascimento: dataNascimento,
-                estadoId: dadosCompletos.estadoId
+                estadoId: dadosCompletos.estadoId,
             });
 
             if (response.success) {
-                messageApi.open({ type: 'success', content: 'Cadastro realizado com sucesso!' })
+                messageApi.open({ type: 'success', content: 'Cadastro realizado com sucesso!' });
                 await syncAuth();
                 navigate('/home');
             } else {
-                messageApi.open({ type: 'warning', content: response.message || 'Erro ao realizar cadastro' })
+                messageApi.open({ type: 'warning', content: response.message || 'Erro ao realizar cadastro' });
             }
         } catch (error: any) {
-            messageApi.open({ type: 'error', content: error.message || 'Erro ao processar cadastro' })
+            messageApi.open({ type: 'error', content: error.message || 'Erro ao processar cadastro' });
         } finally {
             setLoading(false);
         }
@@ -118,72 +158,49 @@ export default function Login() {
 
             const response = await userService.forgotPassword(values.email);
             if (response.success) {
-                messageApi.open({ type: 'success', content: 'Email de recuperação enviado! Verifique sua caixa de entrada.' })
+                messageApi.open({ type: 'success', content: 'Email de recuperação enviado! Verifique sua caixa de entrada.' });
                 setIsModalOpen(false);
                 formRedefinirSenha.resetFields();
             } else {
-                messageApi.open({ type: 'error', content: response.message || 'Erro ao enviar email de recuperação' })
+                messageApi.open({ type: 'error', content: response.message || 'Erro ao enviar email de recuperação' });
             }
         } catch (error: any) {
-            messageApi.open({ type: 'error', content: error.message || 'Erro ao processar solicitação' })
+            messageApi.open({ type: 'error', content: error.message || 'Erro ao processar solicitação' });
         } finally {
             setLoading(false);
         }
     };
 
-    function proximo() {
-        if (opcao == 1) {
-            formUsuario.resetFields();
-        }
-        const valores = formUsuario.getFieldsValue();
-        setDadosUsuario(prev => ({ ...prev, ...valores }));
-        setOpcao(opcao + 1);
-    }
-
-    function voltar() {
-        if (opcao == 2) {
-            formUsuario.resetFields();
-        }
-        setOpcao(opcao - 1);
-    }
-
-    const onFinishFailedLogin: FormProps<UsuarioDTO>['onFinishFailed'] = (errorInfo) => {
-        messageApi.open({ type: 'error', content: 'Ocorreu um erro ao fazer  login\n' + errorInfo });
-    };
-
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCancel = () => {
-        setIsModalOpen(false);
-        formRedefinirSenha.resetFields();
-    };
-
+    // ===== Effects =====
     useEffect(() => {
-        estadoService.getAllEstado().then(estados => {
-            const estadosFormatados = estados.map(estado => ({
-                label: estado.nome,
-                value: estado.id
-            }));
-            setEstados(estadosFormatados);
-        }).catch(error => {
-            console.error('Erro ao carregar estados:', error);
-            messageApi.open({ type: 'error', content: 'Erro ao carregar estados' });
-        });
+        estadoService
+            .getAllEstado()
+            .then((estados) => {
+                const estadosFormatados = estados.map((estado) => ({
+                    label: estado.nome,
+                    value: estado.id,
+                }));
+                setEstados(estadosFormatados);
+            })
+            .catch((error) => {
+                console.error('Erro ao carregar estados:', error);
+                messageApi.open({ type: 'error', content: 'Erro ao carregar estados' });
+            });
     }, []);
 
-
     return (
-        <div className={styles.main} style={{
-            backgroundImage: "url(/bgLogin.avif)",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-        }}>
+        <div
+            className={styles.main}
+            style={{
+                backgroundImage: 'url(/bgLogin.avif)',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+            }}
+        >
             <div className={styles.container}>
                 {contextHolder}
-                {loading && (<Loading />)}
+                {loading && <Loading />}
                 <div className={styles.header}>
                     {opcao > 1 && <BackIcon onClick={voltar} className={styles.backIcon} />}
                     <img src="/ecoLog_logo.png" alt="ecoLog" className={styles.logo} />
@@ -203,18 +220,18 @@ export default function Login() {
                                 <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
                                     <Col style={{ display: 'flex', flexDirection: 'column', gap: '2px' }} span={15}>
                                         <Flex gap="middle" vertical style={{ gap: '26px' }}>
-                                            <Form.Item<UsuarioDTO["email"]>
+                                            <Form.Item<UsuarioDTO['email']>
                                                 name="email"
                                                 rules={[
                                                     { required: true, message: 'Por favor, preencha seu email!' },
-                                                    { type: 'email', message: 'Email inválido!' }
+                                                    { type: 'email', message: 'Email inválido!' },
                                                 ]}
                                                 style={{ marginBottom: '0px' }}
                                             >
                                                 <Input size="large" placeholder="Email@" variant="underlined" />
                                             </Form.Item>
 
-                                            <Form.Item<UsuarioDTO["senha"]>
+                                            <Form.Item<UsuarioDTO['senha']>
                                                 name="senha"
                                                 rules={[{ required: true, message: 'Por favor, preencha sua senha!' }]}
                                             >
@@ -224,12 +241,7 @@ export default function Login() {
 
                                         <Flex gap="middle" vertical style={{ gap: '16px' }}>
                                             <Form.Item label={null} style={{ marginBottom: '0px' }}>
-                                                <BtnPrincipal
-                                                    label='Login'
-                                                    htmlType="submit"
-                                                    size='middle'
-                                                    disabled={loading}
-                                                />
+                                                <BtnPrincipal label='Login' htmlType="submit" size='middle' disabled={loading} />
                                             </Form.Item>
 
                                             <BtnSecundario label='Cadastrar' onClick={proximo} size='middle' disabled={loading} />
@@ -246,19 +258,19 @@ export default function Login() {
                             <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
                                 <Col style={{ display: 'flex', flexDirection: 'column', gap: '26px' }} span={15}>
                                     <Flex gap="middle" vertical style={{ gap: '26px' }}>
-                                        <Form.Item<UsuarioDTO["nome"]>
+                                        <Form.Item<UsuarioDTO['nome']>
                                             name="nome"
                                             rules={[
                                                 { required: true, message: 'Por Favor, preencha o seu nome!' },
                                                 { min: 3, message: 'O nome deve ter no mínimo 3 caracteres!' },
-                                                { max: 80, message: 'O nome deve ter no máximo 80 caracteres!' }
+                                                { max: 80, message: 'O nome deve ter no máximo 80 caracteres!' },
                                             ]}
                                             style={{ marginBottom: '0px' }}
                                         >
                                             <Input size="large" placeholder="Nome Completo" variant="underlined" />
                                         </Form.Item>
 
-                                        <Form.Item<UsuarioDTO["dataNascimento"]>
+                                        <Form.Item<UsuarioDTO['dataNascimento']>
                                             name="dataNascimento"
                                             rules={[{ required: true, message: 'Por Favor, preencha sua data de nascimento!' }]}
                                             style={{ marginBottom: '0px' }}
@@ -272,11 +284,12 @@ export default function Login() {
                                             />
                                         </Form.Item>
 
-                                        <Form.Item<UsuarioDTO["cpf"]>
+                                        <Form.Item<UsuarioDTO['cpf']>
                                             name="cpf"
                                             rules={[
                                                 { required: true, message: 'Por Favor, preencha seu CPF!' },
-                                                { len: 14, message: 'CPF inválido!' }
+                                                 // devido à máscara XXX.XXX.XXX-YY
+                                                validateCpfRule,                       // checa dígitos verificadores
                                             ]}
                                             style={{ marginBottom: '0px' }}
                                         >
@@ -289,12 +302,14 @@ export default function Login() {
                                             />
                                         </Form.Item>
 
-                                        <Form.Item<UsuarioDTO["estadoId"]>
+                                        <Form.Item<UsuarioDTO['estadoId']>
                                             name="estadoId"
                                             rules={[{ required: true, message: 'Por Favor, informe seu estado de residência!' }]}
                                             style={{ marginBottom: '0px' }}
                                         >
                                             <Select
+                                                loading={estados.length == 0}
+                                                disabled={estados.length == 0}
                                                 showSearch
                                                 placeholder="Estado de Residência"
                                                 variant="underlined"
@@ -310,12 +325,7 @@ export default function Login() {
 
                                     <Flex gap="middle" vertical style={{ gap: '16px' }}>
                                         <Form.Item label={null} style={{ marginBottom: '0px' }}>
-                                            <BtnPrincipal
-                                                label='Próximo'
-                                                htmlType="submit"
-                                                size='middle'
-                                                disabled={loading}
-                                            />
+                                            <BtnPrincipal label='Próximo' htmlType="submit" size='middle' disabled={loading} />
                                         </Form.Item>
                                     </Flex>
                                 </Col>
@@ -326,22 +336,22 @@ export default function Login() {
                             <Row style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center' }}>
                                 <Col style={{ display: 'flex', flexDirection: 'column', gap: '26px' }} span={15}>
                                     <Flex gap="middle" vertical style={{ gap: '26px' }}>
-                                        <Form.Item<UsuarioDTO["email"]>
+                                        <Form.Item<UsuarioDTO['email']>
                                             name="email"
                                             rules={[
                                                 { required: true, message: 'Por favor, preencha seu email!' },
-                                                { type: 'email', message: 'Email inválido!' }
+                                                { type: 'email', message: 'Email inválido!' },
                                             ]}
                                             style={{ marginBottom: '0px' }}
                                         >
                                             <Input size="large" placeholder="Email@" variant="underlined" />
                                         </Form.Item>
 
-                                        <Form.Item<UsuarioDTO["senha"]>
+                                        <Form.Item<UsuarioDTO['senha']>
                                             name="senha"
                                             rules={[
                                                 { required: true, message: 'Por favor, preencha sua senha!' },
-                                                validatePasswordRule
+                                                validatePasswordRule,
                                             ]}
                                             style={{ marginBottom: '0px' }}
                                         >
@@ -351,12 +361,7 @@ export default function Login() {
 
                                     <Flex gap="middle" vertical style={{ gap: '16px' }}>
                                         <Form.Item label={null} style={{ marginBottom: '0px' }}>
-                                            <BtnPrincipal
-                                                label='Cadastrar'
-                                                htmlType="submit"
-                                                size='middle'
-                                                disabled={loading}
-                                            />
+                                            <BtnPrincipal label='Cadastrar' htmlType="submit" size='middle' disabled={loading} />
                                         </Form.Item>
                                     </Flex>
                                 </Col>
@@ -373,11 +378,11 @@ export default function Login() {
                     footer={[]}
                 >
                     <Form onFinish={onFinishRedefinirSenha} form={formRedefinirSenha}>
-                        <Form.Item<UsuarioDTO["email"]>
+                        <Form.Item<UsuarioDTO['email']>
                             name="email"
                             rules={[
                                 { required: true, message: 'Por favor, preencha seu email!' },
-                                { type: 'email', message: 'Email inválido!' }
+                                { type: 'email', message: 'Email inválido!' },
                             ]}
                             style={{ marginTop: '16px', marginBottom: '16px' }}
                         >
@@ -386,17 +391,11 @@ export default function Login() {
 
                         <Flex vertical={false} justify='flex-end' gap='8px' style={{ paddingTop: '8px' }}>
                             <BtnSecundario label='Cancelar' onClick={handleCancel} size='middle' disabled={loading} />
-                            <BtnPrincipal
-                                label='Enviar'
-                                htmlType="submit"
-                                size='middle'
-                                width='26%'
-                                disabled={loading}
-                            />
+                            <BtnPrincipal label='Enviar' htmlType="submit" size='middle' width='26%' disabled={loading} />
                         </Flex>
                     </Form>
                 </Modal>
             </div>
         </div>
-    )
+    );
 }

@@ -10,12 +10,13 @@
 
     .container {
         display: flex;
+        flex-direction: column;
         max-height: 100%;
         align-items: center;
         position: relative;
 
         svg {
-            position: absolute;
+            //position: absolute;
             left: -6rem;
             color: #8d8d8d4b;
             font-size: 5em;

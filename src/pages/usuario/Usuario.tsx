@@ -143,7 +143,7 @@ export default function Usuario() {
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center', gap: '3rem' }}>
                         <Row justify="center">
-                            <Col span={ isXs ? 18 : 15 }>
+                            <Col span={isXs ? 18 : 15}>
                                 <Form.Item<UsuarioDTO["email"]>
                                     name="email"
                                     rules={[{ required: false, message: 'Por favor, preencha seu email corretamente!', type: 'email' }]}
@@ -155,7 +155,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={ isXs ? 18 : 15 }>
+                            <Col span={isXs ? 18 : 15}>
                                 <Form.Item<UsuarioDTO["nome"]>
                                     name="nome"
                                     rules={[{ required: true, message: 'Por Favor, preencha o seu nome!' }]}
@@ -167,7 +167,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={ isXs ? 18 : 15 }>
+                            <Col span={isXs ? 18 : 15}>
                                 <Form.Item<UsuarioDTO["dataNascimento"]>
                                     name="dataNascimento"
                                     rules={[{ required: true, message: 'Por Favor, preencha sua data de nascimento!' }]}
@@ -179,7 +179,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={ isXs ? 18 : 15 }>
+                            <Col span={isXs ? 18 : 15}>
                                 <Form.Item<UsuarioDTO["cpf"]>
                                     name="cpf"
                                     rules={[{ required: true, message: 'Por Favor, preencha seu CPF!', len: 14 }]}
@@ -191,13 +191,15 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={ isXs ? 18 : 15 }>
+                            <Col span={isXs ? 18 : 15}>
                                 <Form.Item<UsuarioDTO["estadoId"]>
                                     name="estadoId"
                                     rules={[{ required: true, message: 'Por Favor, informe seu estado de residencia!' }]}
                                     style={{ marginBottom: '0px' }}
                                 >
                                     <Select
+                                        loading={estados.length == 0}
+                                        disabled={estados.length == 0}
                                         showSearch
                                         placeholder="Estado de Residência"
                                         variant="underlined"
@@ -213,7 +215,7 @@ export default function Usuario() {
                         </Row>
 
                         <Row justify="center">
-                            <Col span={ isXs ? 18 : 15 }>
+                            <Col span={isXs ? 18 : 15}>
                                 <Flex gap="middle" vertical={false} style={{ gap: '16px' }}>
                                     <BtnSecundario onClick={async () => {
                                         const confirmed = await modal.confirm(config);
