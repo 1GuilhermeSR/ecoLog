@@ -1,9 +1,9 @@
-import { Col, DatePicker, Flex, Form, FormProps, InputNumber, Modal, Row } from 'antd';
-import { EmissaoEnergiaDTO } from '../../dto/emissao_energia/EmissaoEnergiaDTO';
+import { useEffect, useState } from 'react';
+import { Col, DatePicker, Flex, Form, type FormProps, InputNumber, Modal, Row } from 'antd';
 import BtnPrincipal from '../geral/BtnPrincipal';
 import BtnSecundario from '../geral/BtnSecundario';
+import { EmissaoEnergiaDTO } from '../../dto/emissao_energia/EmissaoEnergiaDTO';
 import styles from './styles.module.scss';
-import { useEffect, useState } from 'react';
 
 interface ModalEmissaoEnergiaProps {
   isOpen: boolean;
@@ -18,7 +18,7 @@ export default function ModalEmissaoEnergia({
   onClose,
   onSave,
   editingItem,
-  fatorEmissaoCO2 = 0.054
+  fatorEmissaoCO2 = 0.054,
 }: ModalEmissaoEnergiaProps) {
   const [form] = Form.useForm<EmissaoEnergiaDTO>();
   const [co2Calculado, setCo2Calculado] = useState<number>(0);
@@ -43,10 +43,7 @@ export default function ModalEmissaoEnergia({
   };
 
   const handleSave: FormProps<EmissaoEnergiaDTO>['onFinish'] = (values) => {
-    const valuesWithCO2 = {
-      ...values,
-      co2Emitido: co2Calculado
-    };
+    const valuesWithCO2 = { ...values, co2Emitido: co2Calculado };
     onSave(valuesWithCO2);
     form.resetFields();
     setCo2Calculado(0);
@@ -61,15 +58,17 @@ export default function ModalEmissaoEnergia({
   return (
     <Modal
       title={
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          borderBottom: '1px solid #8d8d8d6c',
-          color: '#8D8D8D',
-          paddingBottom: '8px',
-          marginBottom: '16px',
-          fontSize: '1.1em'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            borderBottom: '1px solid #8d8d8d6c',
+            color: '#8D8D8D',
+            paddingBottom: '8px',
+            marginBottom: '16px',
+            fontSize: '1.1em',
+          }}
+        >
           <span>Emissão por Energia</span>
         </div>
       }
@@ -87,7 +86,7 @@ export default function ModalEmissaoEnergia({
           <div className={styles.containerForm}>
             <Row>
               <Col span={24}>
-                <Flex vertical={true}>
+                <Flex vertical>
                   <span className={styles.label}>Data:</span>
                   <Form.Item
                     layout="vertical"
@@ -98,7 +97,7 @@ export default function ModalEmissaoEnergia({
                   >
                     <DatePicker
                       format="DD/MM/YYYY"
-                      size='large'
+                      size="large"
                       style={{ width: '100%', color: '#666666ff' }}
                       placeholder=""
                       variant="underlined"
@@ -112,7 +111,7 @@ export default function ModalEmissaoEnergia({
               <Col span={24}>
                 <Flex vertical>
                   <span className={styles.label}>kWh Consumido:</span>
-                  <Form.Item<EmissaoEnergiaDTO["kwhConsumido"]>
+                  <Form.Item<EmissaoEnergiaDTO['kwhConsumido']>
                     layout="vertical"
                     name="kwhConsumido"
                     rules={[
@@ -142,7 +141,7 @@ export default function ModalEmissaoEnergia({
 
             <Row>
               <Col span={24}>
-                <Flex justify='center'>
+                <Flex justify="center">
                   <div className={styles.cardCO2}>
                     <span className={styles.label}>CO2 emitido</span>
                     <span className={styles.valor}>{co2Calculado.toFixed(3)} Kg</span>
@@ -152,19 +151,9 @@ export default function ModalEmissaoEnergia({
             </Row>
           </div>
 
-          <Flex
-            vertical={false}
-            justify='flex-end'
-            gap='8px'
-            style={{ paddingTop: '8px', marginTop: '32px' }}
-          >
-            <BtnSecundario label='Cancelar' onClick={handleCancel} size='middle' />
-            <BtnPrincipal
-              label='Salvar'
-              size='middle'
-              width='26%'
-              onClick={() => form.submit()}
-            />
+          <Flex vertical={false} justify="flex-end" gap="8px" style={{ paddingTop: '8px', marginTop: '32px' }}>
+            <BtnSecundario label="Cancelar" onClick={handleCancel} size="middle" />
+            <BtnPrincipal label="Salvar" size="middle" width="26%" onClick={() => form.submit()} />
           </Flex>
         </div>
       </Form>

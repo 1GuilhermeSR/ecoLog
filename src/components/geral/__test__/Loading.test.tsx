@@ -66,7 +66,7 @@ describe('Loading Component', () => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.49)'
+            backgroundColor: 'rgba(138, 138, 138, 0.2)'
         });
     });
 
