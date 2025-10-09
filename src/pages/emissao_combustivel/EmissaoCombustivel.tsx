@@ -172,10 +172,10 @@ export default function EmissaoCombustivel() {
                 };
 
                 setEmissoes((prev) => upsertByIdMaintainDateDesc(prev, rowForTable));
-                setIsModalOpen(false);
-                setCurrentItem(null);
             }
-
+            
+            setIsModalOpen(false);
+            setCurrentItem(null);
         } catch (error) {
             messageApi.open({ type: 'error', content: 'Erro ao salvar emissão!\n' + error });
         } finally {
