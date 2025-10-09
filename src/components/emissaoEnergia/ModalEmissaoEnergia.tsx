@@ -13,13 +13,7 @@ interface ModalEmissaoEnergiaProps {
   fatorEmissaoCO2?: number;
 }
 
-export default function ModalEmissaoEnergia({
-  isOpen,
-  onClose,
-  onSave,
-  editingItem,
-  fatorEmissaoCO2 = 0.054,
-}: ModalEmissaoEnergiaProps) {
+export default function ModalEmissaoEnergia({ isOpen, onClose, onSave, editingItem, fatorEmissaoCO2 = 0.054 }: ModalEmissaoEnergiaProps) {
   const [form] = Form.useForm<EmissaoEnergiaDTO>();
   const [co2Calculado, setCo2Calculado] = useState<number>(0);
 

@@ -130,7 +130,7 @@ export default function EmissaoCombustivel() {
             let sucesso = false;
 
             const upsert: EmissaoCombustivelUpsertDTO = {
-                id: isEditing ? currentItem!.id : 0,
+                id: isEditing ? currentItem!.id : undefined,
                 data: values.data.format('DD/MM/YYYY'),
                 kmPercorrido: Number(values.kmPercorrido),
                 idCombustivel: Number(values.idCombustivel),
@@ -176,8 +176,6 @@ export default function EmissaoCombustivel() {
                 setCurrentItem(null);
             }
 
-            setIsModalOpen(false);
-            setCurrentItem(null);
         } catch (error) {
             messageApi.open({ type: 'error', content: 'Erro ao salvar emissão!\n' + error });
         } finally {

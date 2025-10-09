@@ -269,7 +269,7 @@ export default function EmissaoEnergia() {
                 </Row>
 
                 <Row style={{ marginTop: '26px' }}>
-                    <Col span={24}>                        
+                    <Col span={24}>
                         <Table<EmissaoEnergiaDTO>
                             rowKey="id"
                             columns={columns}
