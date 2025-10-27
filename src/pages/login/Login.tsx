@@ -80,7 +80,8 @@ export default function Login() {
     }
 
     const onFinishFailedLogin: FormProps<UsuarioDTO>['onFinishFailed'] = (errorInfo) => {
-        messageApi.open({ type: 'error', content: 'Ocorreu um erro ao fazer  login\n' + errorInfo });
+        if(opcao==1)
+            messageApi.open({ type: 'error', content: 'Ocorreu um erro ao fazer  login\n' + errorInfo });
     };
 
     // ===== Async Actions (API) =====
