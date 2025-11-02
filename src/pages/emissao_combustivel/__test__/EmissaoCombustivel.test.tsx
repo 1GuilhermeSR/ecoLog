@@ -220,6 +220,12 @@ describe('EmissaoCombustivel', () => {
     });
 
     it('criação com sucesso (Novo -> preencher -> Salvar) adiciona linha corretamente', async () => {
+        (emissaoService.gravarEmissaoCombustivel as jest.Mock).mockResolvedValue({
+            success: true,
+            data: { id: 1 }
+        });
+
+
         renderWithRouter(<EmissaoCombustivel />, { route: '/combustivel' });
 
         await waitFor(() => expect(emissaoService.getEmissaoByUser).toHaveBeenCalled());

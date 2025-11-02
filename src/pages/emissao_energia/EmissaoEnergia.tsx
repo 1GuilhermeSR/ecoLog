@@ -135,6 +135,7 @@ export default function EmissaoEnergia() {
     const handleSave = async (values: EmissaoEnergiaDTO) => {
         try {
             const isEditing = !!currentItem?.id;
+            var id = 0;
             let sucesso = false;
             setLoading(true);
 
@@ -168,6 +169,7 @@ export default function EmissaoEnergia() {
                 if (response.success) {
                     messageApi.open({ type: 'success', content: 'Emissão gravada com sucesso!' });
                     sucesso = true;
+                    id = response.data.id ?? 0;
                 } else {
                     messageApi.open({ type: 'error', content: 'Erro ao gravar emissão!\n' + response.message });
                 }
@@ -175,7 +177,7 @@ export default function EmissaoEnergia() {
 
             if (sucesso) {
                 const rowForTable: EmissaoEnergiaDTO = {
-                    id: upsert.id ?? emissoes.reduce((m, e) => ((e.id ?? 0) > m ? (e.id ?? 0) : m), 0) + 1,
+                    id: upsert.id ?? id,
                     data: dayjs(upsert.data, 'DD/MM/YYYY'),
                     idEnergia: upsert.idEnergia,
                     fatorEmissao: upsert.fatorEmissao,

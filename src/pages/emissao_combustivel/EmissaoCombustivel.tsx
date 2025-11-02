@@ -128,6 +128,7 @@ export default function EmissaoCombustivel() {
             setLoading(true);
             const isEditing = !!currentItem?.id;
             let sucesso = false;
+            var id;
 
             const upsert: EmissaoCombustivelUpsertDTO = {
                 id: isEditing ? currentItem!.id : undefined,
@@ -151,6 +152,7 @@ export default function EmissaoCombustivel() {
                 const response = await emissaoCombustivelService.gravarEmissaoCombustivel(upsert);
                 if (response.success) {
                     messageApi.open({ type: 'success', content: 'Emissão gravada com sucesso!' });
+                    id = response.data.id ?? 0;
                     sucesso = true;
                 } else {
                     messageApi.open({ type: 'error', content: 'Erro ao gravar emissão!\n' + response.message });
@@ -159,7 +161,7 @@ export default function EmissaoCombustivel() {
 
             if (sucesso) {
                 const rowForTable: EmissaoCombustivelDTO = {
-                    id: upsert.id ?? emissoes.reduce((m, e) => ((e.id ?? 0) > m ? (e.id ?? 0) : m), 0) + 1,
+                    id: upsert.id ?? id,
                     data: dayjs(upsert.data, 'DD/MM/YYYY'),
                     idCombustivel: upsert.idCombustivel,
                     nomeCombustivel: values.nomeCombustivel ?? currentItem?.nomeCombustivel ?? '',
