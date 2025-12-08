@@ -1,46 +1,106 @@
-# Getting Started with Create React App
+# 🌱 ecoLog – Front-end
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este repositório contém a interface web do **ecoLog**, um sistema voltado para o acompanhamento das **emissões pessoais de CO₂**, desenvolvido como projeto de **Trabalho de Conclusão de Curso (TCC)** em Engenharia de Software.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🧩 Sobre o projeto
 
-### `npm start`
+O **ecoLog** ajuda pessoas a entenderem e acompanharem o impacto das suas ações diárias no meio ambiente, com foco em duas frentes principais:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **Consumo de energia elétrica residencial**
+- **Uso de combustíveis em veículos**
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+A ideia é transformar dados que normalmente ficam “escondidos” (contas de luz, quilometragem, tipo de combustível etc.) em **informações visuais claras**, como gráficos, indicadores e comparações.
 
-### `npm test`
+Com o ecoLog, o usuário pode:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Registrar mensalmente seu consumo de energia e abastecimentos.
+- Acompanhar a **evolução das emissões de CO₂** ao longo do tempo.
+- Comparar seu desempenho com **médias de referência** (por exemplo, média do estado).
+- Receber **dicas e sugestões** para reduzir o impacto ambiental.
 
-### `npm run build`
+O objetivo principal é ser uma ferramenta simples, visual e acessível que estimule mudanças de hábito por meio de dados concretos.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🛠️ Características técnicas
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### ⚙️ Stack principal
 
-### `npm run eject`
+O front-end do ecoLog foi desenvolvido como uma **SPA (Single Page Application)** usando:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- **React** com **TypeScript**
+- **Ant Design (antd)** para componentes de interface
+- **Chart.js** para gráficos
+- **Day.js** para manipulação de datas
+- **Axios** para consumo da API
+- **React Router** para navegação entre páginas
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 🧱 Arquitetura do front-end
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+O projeto segue uma organização orientada a camadas de responsabilidade, facilitando manutenção e evolução:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- **Páginas (pages)**  
+  Telas principais da aplicação, como:
+  - Login / Cadastro
+  - Dashboard de emissões
+  - Tela de registro de energia
+  - Tela de registro de combustível
 
-## Learn More
+- **Componentes (components)**  
+  Componentes reutilizáveis de interface (botões, cards, formulários, cabeçalhos, etc.), aproveitando e estendendo o Ant Design sempre que possível.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Serviços (services)**  
+  Módulos responsáveis pela comunicação com a API back-end (ecoLog API), encapsulando chamadas HTTP com Axios, tratamento básico de erros.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- **Tipos / DTOs (types ou dto)**  
+  Definições de tipos e modelos (TypeScript) para representar:
+  - Usuário
+  - Registros de consumo
+  - Respostas da API
+
+- **Contextos / Hooks (context / hooks)**  
+  Uso de Context API e hooks personalizados para:
+  - Gerenciar o estado de autenticação (usuário logado, token, etc.).
+  - Compartilhar dados globais como configurações do usuário.
+
+### 🔐 Integração com o back-end
+
+O front-end consome uma **API REST** desenvolvida em **.NET**, responsável por:
+
+- Autenticação e autorização com **JWT**.
+- Cálculo das emissões com base em fatores de emissão (energia e combustível).
+- Persistência dos dados de consumo e das emissões.
+
+### 🎨 Interface e experiência do usuário
+
+- Uso dos componentes do **Ant Design**, garantindo:
+  - Layout responsivo.
+  - Formulários com validações claras.
+  - Cards e indicadores no dashboard.
+- **Gráficos com Chart.js**, permitindo:
+  - Visualizar a evolução mensal das emissões.
+  - Separar emissões por tipo de fonte (energia vs. combustível).
+  - Comparar emissões atuais com metas e médias.
+
+### 🧪 Qualidade de código 
+
+- Todo o código foi testado usando jest e react testing library
+
+### 🚀 Como executar o projeto localmente
+
+
+```bash
+# Clonar o repositório
+git clone https://github.com/1GuilhermeSR/ecoLog_frontEnd.git
+cd ecoLog_frontEnd
+
+# Instalar dependências
+npm install
+
+# Rodar em ambiente de desenvolvimento
+npm start
+
+# Gerar build de produção
+npm run build
